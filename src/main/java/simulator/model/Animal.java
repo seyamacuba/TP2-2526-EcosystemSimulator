@@ -7,6 +7,15 @@ import simulator.misc.Vector2D;
 import java.util.Vector;
 
 public abstract class Animal implements Entity,AnimalInfo {
+
+  final static double INIT_ENERGY = 100.0;
+  final static double MUTATION_TOLERANCE = 0.2;
+  final static double NEARBY_FACTOR = 60.0;
+  final static double COLLISION_RANGE = 8;
+  final static double HUNGER_DECAY_EXP_FACTOR = 0.007;
+  final static double MAX_ENERGY = 100.0;
+  final static double MAX_DESIRE = 100.0;
+
   private String geneticCode;
   private Diet diet;
   private State state;
