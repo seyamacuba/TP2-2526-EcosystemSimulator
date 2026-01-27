@@ -1,5 +1,6 @@
 package simulator.model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.misc.Utils;
 import simulator.misc.Vector2D;
@@ -31,12 +32,44 @@ public abstract class Animal implements Entity,AnimalInfo {
   private AnimalMapView regionMngr;
   private SelectionStrategy mateStrategy;
 
+  protected Animal(String geneticCode, Diet diet, double sightRange, double initSpeed, SelectionStrategy mateStrategy, Vector2D pos){
+    setState(State.NORMAL);
+    setEnergy(100.0);
+    setDesire(0.0);
+    setDest(null);
+    setMateTarget(null);
+    setBaby(null);
+    setRegionMngr(null);
+    setGeneticCode(geneticCode);
+    setDiet(diet);
+    setSightRange(sightRange);
+    setSpeed(initSpeed);
+    setMateStrategy(mateStrategy);
+    setPos(pos);
+  }
+  protected Animal(Animal p1, Animal p2){
+    setState(State.NORMAL);
+    double energy = (p1.getEnergy()+p2.getEnergy())/2;
+    setEnergy(energy);
+    setDesire(0.0);
+    setDest(null);
+    setMateTarget(null);
+    setBaby(null);
+    setRegionMngr(null);
+    setDiet(p1.getDiet());
+    setGeneticCode(p1.getGeneticCode());
+    setMateStrategy(p2.getMateStrategy());
+    setPos(p1.getPosition().plus(Vector2D.get_random_vector(-1,1).scale(60.0*(Utils.RAND.nextGaussian()+1))));
+    setSightRange(Utils.getRandomizedParameter((p1.getSightRange()+p2.getSightRange())/2,0.2));
+    setSpeed(Utils.getRandomizedParameter((p1.getSpeed()+p2.getSpeed())/2, 0.2));
+
+  }
   @Override
   public String getGeneticCode() {
     return geneticCode;
   }
 
-  public void setGeneticCode(String geneticCode) {
+  protected void setGeneticCode(String geneticCode) {
     this.geneticCode = geneticCode;
   }
 
@@ -45,7 +78,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return diet;
   }
 
-  public void setDiet(Diet diet) {
+  protected void setDiet(Diet diet) {
     this.diet = diet;
   }
 
@@ -54,7 +87,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return state;
   }
 
-  public void setState(State state) {
+  protected void setState(State state) {
     this.state = state;
     switch(this.state){
       case NORMAL:
@@ -80,7 +113,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return pos;
   }
 
-  public void setPos(Vector2D pos) {
+  protected void setPos(Vector2D pos) {
     this.pos = pos;
   }
 
@@ -88,7 +121,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return dest;
   }
 
-  public void setDest(Vector2D dest) {
+  protected void setDest(Vector2D dest) {
     this.dest = dest;
   }
 
@@ -97,7 +130,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return energy;
   }
 
-  public void setEnergy(double energy) {
+  protected void setEnergy(double energy) {
     this.energy = energy;
   }
 
@@ -106,7 +139,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return age;
   }
 
-  public void setAge(double age) {
+  protected void setAge(double age) {
     this.age = age;
   }
 
@@ -115,7 +148,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return speed;
   }
 
-  public void setSpeed(double speed) {
+  protected void setSpeed(double speed) {
     this.speed = speed;
   }
 
@@ -123,7 +156,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return desire;
   }
 
-  public void setDesire(double desire) {
+  protected void setDesire(double desire) {
     this.desire = desire;
   }
 
@@ -132,7 +165,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return sightRange;
   }
 
-  public void setSightRange(double sightRange) {
+  protected void setSightRange(double sightRange) {
     this.sightRange = sightRange;
   }
 
@@ -140,7 +173,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return mateTarget;
   }
 
-  public void setMateTarget(Animal mateTarget) {
+  protected void setMateTarget(Animal mateTarget) {
     this.mateTarget = mateTarget;
   }
 
@@ -148,7 +181,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return baby;
   }
 
-  public void setBaby(Animal baby) {
+  protected void setBaby(Animal baby) {
     this.baby = baby;
   }
 
@@ -156,7 +189,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     return regionMngr;
   }
 
-  public void setRegionMngr(AnimalMapView regionMngr) {
+  protected void setRegionMngr(AnimalMapView regionMngr) {
     this.regionMngr = regionMngr;
   }
 
@@ -164,53 +197,20 @@ public abstract class Animal implements Entity,AnimalInfo {
     return mateStrategy;
   }
 
-  public void setMateStrategy(SelectionStrategy mateStrategy) {
+  protected void setMateStrategy(SelectionStrategy mateStrategy) {
     this.mateStrategy = mateStrategy;
   }
 
-  protected Animal(String geneticCode, Diet diet, double sightRange, double initSpeed, SelectionStrategy mateStrategy, Vector2D pos){
-    setState(State.NORMAL);
-    setEnergy(100.0);
-    setDesire(0.0);
-    setDest(null);
-    setMateTarget(null);
-    setBaby(null);
-    setRegionMngr(null);
-    setGeneticCode(geneticCode);
-    setDiet(diet);
-    setSightRange(sightRange);
-    setSpeed(initSpeed);
-    setMateStrategy(mateStrategy);
-    setPos(pos);
-  }
-
-  protected Animal(Animal p1, Animal p2){
-    setState(State.NORMAL);
-    double energy = (p1.getEnergy()+p2.getEnergy())/2;
-    setEnergy(energy);
-    setDesire(0.0);
-    setDest(null);
-    setMateTarget(null);
-    setBaby(null);
-    setRegionMngr(null);
-    setDiet(p1.getDiet());
-    setGeneticCode(p1.getGeneticCode());
-    setMateStrategy(p2.getMateStrategy());
-    setPos(p1.getPosition().plus(Vector2D.get_random_vector(-1,1).scale(60.0*(Utils.RAND.nextGaussian()+1))));
-    setSightRange(Utils.getRandomizedParameter((p1.getSightRange()+p2.getSightRange())/2,0.2));
-    setSpeed(Utils.getRandomizedParameter((p1.getSpeed()+p2.getSpeed())/2, 0.2));
-
-  }
 
   //MÉTODOS:
-  void init(AnimalMapView regMngr){ //Override del gestor
-
+  public void init(AnimalMapView regMngr){ //Override del gestor
+    setRegionMngr(regMngr);
   }
 
-  Animal deliverBaby(Animal mama){
-    Animal baby = mama.baby;
-    mama.baby = null;
-    return baby;
+  public Animal deliverBaby(){
+    Animal b = baby;
+    baby = null;
+    return b;
   }
 
   protected void move(double speed){
@@ -219,21 +219,18 @@ public abstract class Animal implements Entity,AnimalInfo {
 
   @Override
   public JSONObject asJSON() { //CORREGIR.
-    return AnimalInfo.super.asJSON();
+    JSONObject obj = new JSONObject();
+    obj.put("pos", new JSONArray(new double[]{pos.getX(), pos.getY()}));
+    obj.put("gcode", geneticCode);
+    obj.put("diet", diet.toString());
+    obj.put("state", state.toString());
+    return obj;
   }
-
-  protected void setNormalStateAction(){
-
-  }
-  protected void setHungerStateAction(){
-
-  }
-  protected void setDeadStateAction(){
-
-  }protected void setDangerStateAction(){
-
-  }
-  protected void setMateStateAction(){
-
-  }
+  // MÉTODOS QUE NECESITAN IMPLEMENTAR LAS SUBCLASES:
+  public abstract void update(double dt);
+  protected abstract void setNormalStateAction();
+  protected abstract void setHungerStateAction();
+  protected abstract void setDeadStateAction();
+  protected abstract void setDangerStateAction();
+  protected abstract void setMateStateAction();
 }

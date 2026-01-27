@@ -25,21 +25,46 @@ public class Sheep extends Animal{
 
   @Override
   public Vector2D getPosition() {
-    return null;
+    return getPos();
   }
 
   @Override
   public Vector2D getDestination() {
-    return null;
+    return getDest();
   }
 
   @Override
   public boolean isPregnant() {
-    return false;
+    return getBaby() != null;
   }
 
   @Override
   public void update(double dt) {
+
+  }
+
+  @Override
+  protected void setNormalStateAction() {
+
+  }
+
+  @Override
+  protected void setHungerStateAction() {
+
+  }
+
+  @Override
+  protected void setDeadStateAction() {
+
+  }
+
+  @Override
+  protected void setDangerStateAction() {
+
+  }
+
+  @Override
+  protected void setMateStateAction() {
 
   }
 }
