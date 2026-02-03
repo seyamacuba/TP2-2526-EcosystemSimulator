@@ -20,7 +20,7 @@ public class Sheep extends Animal{
   }
 
   protected Sheep(Sheep p1, Animal p2) {
-    super(p1, p2);
+    super(p1, p2); //Llamada a la super clase.
   }
 
   @Override
@@ -40,7 +40,17 @@ public class Sheep extends Animal{
 
   @Override
   public void update(double dt) {
+    if(this.getState() == State.DEAD){ //Si esta morío bye
+      return;
+    }
 
+    if(this.getEnergy() == 0.0 && this.getAge() > 8.0){
+      setState(State.DEAD); //Lo vuelvo a matar
+    }
+
+    //Posicion fuera del mapa.
+    //Actualizar el objeto segun el estado del animal.
+    //Pide food
   }
 
   @Override
