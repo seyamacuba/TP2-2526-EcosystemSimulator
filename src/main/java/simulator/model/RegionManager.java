@@ -1,5 +1,6 @@
 package simulator.model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -7,7 +8,7 @@ import java.util.function.Predicate;
 
 public class RegionManager implements AnimalMapView{
   int cols, rows, width, height, regionWidth, regionHeight;
-  List<DefaultRegion> regions;
+  Region[][] regions; //Matriz de regiones mejor.
   Map<Animal, Region> animalRegion;
   public RegionManager(int cols, int rows, int width, int height){
     this.cols = cols;
@@ -16,17 +17,15 @@ public class RegionManager implements AnimalMapView{
     this.height = height;
     this.regionWidth = width/cols;
     this.regionHeight = height/rows;
-    regions =  new ArrayList<DefaultRegion>();
+    this.regions = new Region[rows][cols]; // Creo la matriz de regiones
     animalRegion = new HashMap<Animal, Region>();
-  }
-  @Override
-  public List<Animal> getAnimalsInRange(Animal e, Predicate<Animal> filter) {
-    return List.of();
-  }
 
-  @Override
-  public double getFood(AnimalInfo a, double dt) {
-    return 0;
+    //Lleno la lista de regiones
+    for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        regions[i][j] = new DefaultRegion(); //HAY QUE AÑADIR PARÁMETROS AL DEFAULT REGION.
+      }
+    }
   }
 
   @Override
@@ -59,31 +58,101 @@ public class RegionManager implements AnimalMapView{
     return this.regionHeight;
   }
 
-  public void setRegion(int row, int col, Region r){
+  public void setRegion(int row, int col, Region r){ //Sustituye la region.
+    Region antiguo = regions[row][col];
 
+    for(Animal a : antiguo.getAnimals()){
+      r.addAnimal(a);
+      animalRegion.put(a,r);
+    }
+    regions[row][col] = r; //Actualizo a la nueva region.
   }
-  void registerAnimal(Animal a){
 
+  private Region getRegion(double x, double y){ //Método auxiliar privado, que obtiene la region a partir de un punto.
+    int columna = (int) (x/regionWidth);
+    int fila = (int) (y/regionHeight); //Obtengo los índices de la matriz.
+
+    if(columna >= this.cols) columna = this.cols -1;
+    if(columna < 0) columna = 0;
+    if(fila >= this.rows) fila = this.rows -1;
+    if(fila < 0) fila = 0;
+
+    return regions[fila][columna];
   }
+  void registerAnimal(Animal a){ //x e y son iguales a pixeles.
+    Region actual = getRegion(a.getPos().getX(), a.getPos().getY()); //Obtengo la region a la que pertenece el animal.
+    actual.addAnimal(a); //Lo añade a la región.
+    animalRegion.put(a, actual); //Guarda la relación animal - región.
+    a.init(this); //Seteo el regionManager el animal como el actual.
+  }
+
   //encuentra la región a la que tiene que pertenecer el animal (a partir de su posición) y lo añade a esa región y actualiza animalRegion. Además, llama al método init pasándole una referencia a sí mismo (el gestor de regiones).
 
-  void unregisterAnimal(Animal a){}
+  void unregisterAnimal(Animal a){
+    Region actual = animalRegion.get(a);
+    if(actual != null){ //Si esta en una región.
+      actual.removeAnimal(a);
+      animalRegion.remove(a); //Lo elimino del animal region.
+    }
+  }
   //quita el animal de la región a la que pertenece y actualiza animalRegion.
 
-  void updateanimalRegion(Animal a){}
+  void updateanimalRegion(Animal a){
+    Region pertenece = animalRegion.get(a); //Obtengo la region a la que pertenece.
+    Region actual = getRegion(a.getPos().getX(), a.getPos().getY()); //Obtengo su región actual.
+
+    if(pertenece != actual){
+      pertenece.removeAnimal(a);
+      actual.addAnimal(a);
+      animalRegion.put(a, actual); //LO ELIMINA EL ANTERIOR AUTOMÁTICAMENTE.
+    }
+  }
   //encuentra la región a la que tiene que pertenecer el animal (a partir de su posición actual), y si es distinta de su región actual lo añade a la nueva región, lo quita de la anterior, y actualiza animalRegion.
 
-  public double getFood(AnimalInfo a, double dt){}
+  @Override
+  public double getFood(AnimalInfo a, double dt){
+    Region regionAnimal = animalRegion.get((Animal)a); //Obtengo la región del animal.
+    return regionAnimal.getFood(a,dt);
+  }
   //llama a getFood de la región a la que pertenece el animal y devuelve el valor correspondiente.
 
-  void updateAllRegions(double dt){}
+  public void updateAllRegions(double dt){
+    for(int i = 0; i < this.rows; i++){
+      for(int j = 0; j < this.cols; j++){
+        regions[i][j].update(dt);
+
+      }
+    }
+  }
   //llama a update de todas la regiones en la matriz de regiones.
 
-  public List<Animal> getAnimalsInRange(Animal a, Predicate<Animal> filter){}
+  public List<Animal> getAnimalsInRange(Animal a, Predicate<Animal> filter){
+    List<Animal> animalsRange = new ArrayList<>();
+    double x = a.getPos().getX();
+    double y = a.getPos().getY();
+    double sightRange = a.getSightRange();
+  }
   //devuelve un lista de todos los animales que están en el campo visual del animal a y cumplen la condición filter. Debe consultar sólo las regiones en el campo visual.
 
   public JSONObject asJSON(){
-    return null;
+    JSONObject json = new JSONObject();
+    JSONArray arrayRegiones = new JSONArray();
+
+    for(int i = 0; i < this.rows; i++){
+      for(int j = 0; j < this.cols; j++){
+        JSONObject region = new JSONObject();
+        region.put("row", i);
+        region.put("col", j);
+        region.put("data", regions[i][j].asJSON());
+
+        arrayRegiones.put(region); //Añado la region.
+      }
+    }
+
+    json.put("regions",arrayRegiones); //Lo añado al json final.
+
+    return json;
+
     //devuelve una estructura JSON de la siguiente forma
     //
     //  {
