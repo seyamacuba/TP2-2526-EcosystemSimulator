@@ -2,6 +2,7 @@ package simulator.model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import simulator.misc.Vector2D;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -129,11 +130,44 @@ public class RegionManager implements AnimalMapView{
   @Override
   public List<Animal> getAnimalsInRange(Animal e, Predicate<Animal> filter){
     List<Animal> animalsRange = new ArrayList<>();
-    double x = e.getPos().getX();
-    double y = e.getPos().getY();
-    double sightRange = e.getSightRange();
 
-    for(Animal other : this.ani)
+    double sightRange = e.getSightRange();
+    Vector2D posicion = e.getPos();
+
+    //Calculo el rango donde puede ver el animal
+    double minX = posicion.getX()-sightRange;
+    double minY = posicion.getY()-sightRange;
+    double maxX= posicion.getX()+sightRange;
+    double maxY = posicion.getY()+sightRange;
+
+    //Convierto a indices de la matriz.
+    int xmin = (int) (minX/this.regionWidth);
+    int xmax = (int) (maxX / this.regionWidth);
+    int ymin = (int) (minY/this.regionHeight);
+    int ymax = (int) (maxY/this.regionHeight);
+
+    //Aseguro que no me salgo.
+    xmin= Math.max(0, xmin);
+    xmax = Math.min(this.cols-1, xmax);
+
+    ymin= Math.max(0,ymin);
+    ymax = Math.min(this.rows-1, ymax);
+
+    for(int i = xmin; i <= xmax; i++){
+      for(int j = ymin; j <= ymax; j++){
+        Region region = this.regions[j][i]; //Obtengo la region.
+
+        for(Animal a : region.getAnimals()){
+          //Recorro todos los animales de esa region.
+
+          if(a.getPos().minus(e.getPos()).magnitude() <= sightRange && a != e && filter.test(a)){
+            animalsRange.add(a);
+          }
+        }
+      }
+    }
+
+    return animalsRange;
   }
   //devuelve un lista de todos los animales que están en el campo visual del animal a y cumplen la condición filter. Debe consultar sólo las regiones en el campo visual.
 
