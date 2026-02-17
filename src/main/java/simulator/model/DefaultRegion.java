@@ -1,6 +1,7 @@
 package simulator.model;
+
 //Solo comida a los animales herbívoros
-public class DefaultRegion extends Region{
+public class DefaultRegion extends Region {
   @Override
   public void update(double dt) {
     //Lo dejo vacio, porque dice que el update no hace nada.
@@ -8,6 +9,7 @@ public class DefaultRegion extends Region{
 
   @Override
   public double getFood(AnimalInfo a, double dt) {
-    return 0;
+    return calculateFood(a, dt);
   }
 }
+

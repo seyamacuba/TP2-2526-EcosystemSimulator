@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import simulator.misc.Utils;
 import simulator.misc.Vector2D;
 
+import java.util.List;
 import java.util.Vector;
 
 public abstract class Animal implements Entity,AnimalInfo {
@@ -33,8 +34,24 @@ public abstract class Animal implements Entity,AnimalInfo {
   private SelectionStrategy mateStrategy;
 
   protected Animal(String geneticCode, Diet diet, double sightRange, double initSpeed, SelectionStrategy mateStrategy, Vector2D pos){
+    if(geneticCode == null || geneticCode.isEmpty()){
+      throw new IllegalArgumentException("Genetic Code cannot be empty");
+    }
+    if(diet == null){
+      throw new IllegalArgumentException("Diet cannot be null");
+    }
+    if(sightRange <= 0){
+      throw new IllegalArgumentException("Sight Range must be positive");
+    }
+    if(initSpeed <= 0){
+      throw new IllegalArgumentException("Initial Speed must be positive");
+    }
+    if(mateStrategy == null){
+      throw new IllegalArgumentException("Mate Strategy cannot be null");
+    }
     setState(State.NORMAL);
-    setEnergy(100.0);
+    setAge(0.0);
+    setEnergy(INIT_ENERGY);
     setDesire(0.0);
     setDest(null);
     setMateTarget(null);
@@ -213,6 +230,25 @@ public abstract class Animal implements Entity,AnimalInfo {
     return b;
   }
 
+  protected void updateBasicAttributes(double dt, double energyLoss, double desireChange) {
+    setAge(getAge() + dt);
+    setEnergy(Math.max(0.0, Math.min(MAX_ENERGY, getEnergy() - energyLoss)));
+    setDesire(Math.max(0.0, Math.min(MAX_DESIRE, getDesire() + desireChange)));
+  }
+  protected double calculateSpeed(double baseSpeed, double boost) {
+    return baseSpeed * boost * Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
+  }
+  protected Animal findTarget(SelectionStrategy strategy, String geneticCode) {
+    List<Animal> candidates = getRegionMngr().getAnimalsInRange(this,
+      a -> a.getGeneticCode().equals(geneticCode));
+    return strategy.select(this, candidates);
+  }
+
+  protected Animal findPrey(SelectionStrategy strategy, Diet diet) {
+    List<Animal> candidates = getRegionMngr().getAnimalsInRange(this,
+      a -> a.getDiet() == diet);
+    return strategy.select(this, candidates);
+  }
   protected void move(double speed){
     pos = pos.plus(dest.minus(pos).direction().scale(speed));
   }
