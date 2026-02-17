@@ -126,11 +126,14 @@ public class RegionManager implements AnimalMapView{
   }
   //llama a update de todas la regiones en la matriz de regiones.
 
-  public List<Animal> getAnimalsInRange(Animal a, Predicate<Animal> filter){
+  @Override
+  public List<Animal> getAnimalsInRange(Animal e, Predicate<Animal> filter){
     List<Animal> animalsRange = new ArrayList<>();
-    double x = a.getPos().getX();
-    double y = a.getPos().getY();
-    double sightRange = a.getSightRange();
+    double x = e.getPos().getX();
+    double y = e.getPos().getY();
+    double sightRange = e.getSightRange();
+
+    for(Animal other : this.ani)
   }
   //devuelve un lista de todos los animales que están en el campo visual del animal a y cumplen la condición filter. Debe consultar sólo las regiones en el campo visual.
 

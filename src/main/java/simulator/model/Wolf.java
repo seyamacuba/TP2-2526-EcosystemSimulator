@@ -67,13 +67,14 @@ private void updateNormal(double dt){
   this.setEnergy(limitar(this.getEnergy() - 18.0 * dt, 0.0, 100.0));
   this.setDesire(limitar(getDesire() + 30.0 * dt, 0.0, 100.0));
 
-  if(getEnergy() < 50.0){
+  if(getEnergy() < FOOD_THRSHOLD_WOLF){
     this.setState(State.HUNGER);
-  }else if(getDesire() > 65.0){
+  }else if(getDesire() > DESIRE_THRESHOLD_WOLF){
     this.setState(State.MATE);
   }
 }
 
+//updateHunger faltan implementar cosas y pulir
 private void updateHunger(double dt){
     if(this.huntTarget != null && this.getState() == State.DEAD || getMateTarget().getPos().minus(getPos()).magnitude() > getSightRange()){
       setMateTarget(null);
@@ -99,20 +100,67 @@ private void updateHunger(double dt){
       this.huntTarget = null;
       setEnergy(limitar(getEnergy() + 50.0, 0.0, 100.0));
     }
-
-    if(getEnergy() > 50.0){
-      if(getEnergy() < 65.0){
-        setState(State.NORMAL);
-      }else{
-        setState(State.MATE);
-      }
+  }
+  if(getEnergy() > 50.0){
+    if(getEnergy() < 65.0){
+      setState(State.NORMAL);
+    }else{
+      setState(State.MATE);
     }
-
   }
 }
 
 private void updateMate(double dt){
+    //Si la pareja existe, pero esta muy lejos nos olvidamos.
+  if (this.getMateTarget() != null && (getMateTarget().getState() == State.DEAD ||
+    getMateTarget().getPos().minus(getPos()).magnitude() > getSightRange())) {
+    setMateTarget(null);
+  }
 
+    if(getMateTarget() == null){
+      //Conseguimos pareja nueva, hacer uso del lambda!!!!
+      setMateTarget(getMateStrategy().select(this, getRegionMngr().getAnimalsInRange(this, a -> a.getGeneticCode().equals(WOLF_GENETIC_CODE))
+      ));
+    }
+
+    //Tras la asignación
+  if(getMateTarget() == null){
+    //Si sigue siendo nulo, avanza.
+    double velocidad = 3.0 * INIT_SPEED_WOLF * dt * Math.exp((getEnergy() - 100.0) * 0.007);
+    move(velocidad);
+  }else{
+    setDest(getMateTarget().getPos());
+    double velocidad = 3.0 * INIT_SPEED_WOLF * dt * Math.exp((getEnergy() - 100.0) * 0.007);
+    move(velocidad);
+    setAge(getAge() + dt);
+    setEnergy(limitar(this.getEnergy() - (18.0 * 1.2) * dt, 0.0, 100.0));
+    setDesire(limitar(getDesire() + 30.0 * dt, 0.0, 100.0));
+
+    Vector2D distanciaMate = getMateTarget().getPos().minus(getPos());
+
+    if(distanciaMate.magnitude() < 8.0){
+      getMateTarget().setDesire(0.0);
+      setDesire(0.0);
+
+      if (getBaby() == null && Utils.RAND.nextDouble() < 0.9) {
+        Wolf bebe = new Wolf(this, getMateTarget());
+        setBaby(bebe);
+      }
+
+      this.setEnergy(limitar(this.getEnergy() - 10.0, 0.0, 100.0));
+      setMateTarget(null);
+    }
+
+  }
+
+  //Final check:
+  if(getEnergy() < FOOD_THRSHOLD_WOLF){
+    setState(State.HUNGER);
+    setHungerStateAction();
+  }else if(getDesire() < DESIRE_THRESHOLD_WOLF){
+    setState(State.NORMAL);
+    setNormalStateAction();
+  }
 }
 
 //MÉTODO UPDATE GENERAL:
