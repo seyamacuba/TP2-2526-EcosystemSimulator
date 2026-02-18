@@ -8,7 +8,7 @@ public class DynamicSupplyRegion extends Region {
 
   public DynamicSupplyRegion(double food, double growthFactor) {
     super();
-    if (food < 0) throw new IllegalArgumentException("Initial food must be positive");
+    if (food <= 0) throw new IllegalArgumentException("Initial food must be positive"); //cambio < a <= porque debe ser positivo, no puede ser 0
     if (growthFactor < 0) throw new IllegalArgumentException("Growth factor must be positive");
     this.food = food;
     this.growthFactor = growthFactor;

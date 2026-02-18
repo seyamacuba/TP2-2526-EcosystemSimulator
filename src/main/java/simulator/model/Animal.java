@@ -60,7 +60,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     setGeneticCode(geneticCode);
     setDiet(diet);
     setSightRange(sightRange);
-    setSpeed(initSpeed);
+    setSpeed(Utils.getRandomizedParameter(initSpeed, 0.1));
     setMateStrategy(mateStrategy);
     setPos(pos);
   }
@@ -79,7 +79,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     setPos(p1.getPosition().plus(Vector2D.get_random_vector(-1,1).scale(60.0*(Utils.RAND.nextGaussian()+1))));
     setSightRange(Utils.getRandomizedParameter((p1.getSightRange()+p2.getSightRange())/2,0.2));
     setSpeed(Utils.getRandomizedParameter((p1.getSpeed()+p2.getSpeed())/2, 0.2));
-
+    setAge(0.0);
   }
   @Override
   public String getGeneticCode() {
@@ -218,10 +218,50 @@ public abstract class Animal implements Entity,AnimalInfo {
     this.mateStrategy = mateStrategy;
   }
 
+  //faltan estos de AnimalInfo, aunque esten con otros nombres
+  @Override
+  public Vector2D getPosition() {
+    return pos;
+  }
+  @Override
+  public Vector2D getDestination() {
+    return dest;
+  }
+  @Override
+  public boolean isPregnant() {
+    return baby != null;
+  }
+
+
 
   //MÉTODOS:
+  private Vector2D adjustPos(Vector2D pos, int width, int height){  //metodo de Ajustar Posiciones
+    double x = pos.getX();
+    double y = pos.getY();
+    while (x>= width) x -= width;
+    while (x < 0) x += width;
+    while (y>= height) y -= height;
+    while (y < 0) y += height;
+
+    return new Vector2D(x,y);
+  }
+
   public void init(AnimalMapView regMngr){ //Override del gestor
     setRegionMngr(regMngr);
+    int width = regionMngr.getWidth();
+    int height = regionMngr.getHeight();
+    //si pos es null, pos aleatoria
+    if(this.pos == null){
+      double x = Utils.RAND.nextDouble() * (width - 1);
+      double y = Utils.RAND.nextDouble() * (height - 1);
+      this.pos = new Vector2D(x, y);
+    }else { //si pos no es null, ajustar dentro del mapa si necesario
+      this.pos = adjustPos(this.pos, width, height);
+    }
+    //elige pos aleatoria para dest
+    double dx = Utils.RAND.nextDouble() * (width - 1);
+    double dy = Utils.RAND.nextDouble() * (height - 1);
+    this.dest = new Vector2D(dx, dy);
   }
 
   public Animal deliverBaby(){

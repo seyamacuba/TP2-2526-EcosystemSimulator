@@ -20,7 +20,7 @@ public class Sheep extends Animal {
   private Animal dangerSource;
   private SelectionStrategy dangerStrategy;
 
-  protected Sheep(SelectionStrategy dangerStrategy, SelectionStrategy mateStrategy, Vector2D pos) {
+  protected Sheep(SelectionStrategy mateStrategy, SelectionStrategy dangerStrategy, Vector2D pos) {
     super(SHEEP_GENETIC_CODE, Diet.HERBIVORE, INIT_SIGHT_SHEEP, INIT_SPEED_SHEEP, mateStrategy, pos);
     this.dangerStrategy = dangerStrategy;
     this.dangerSource = null;
@@ -98,9 +98,14 @@ public class Sheep extends Animal {
     updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
 
     // Cambios de estado
-    List<Animal> wolves = getRegionMngr().getAnimalsInRange(this,
-      a -> a.getDiet() == Diet.CARNIVORE);
-    if (!wolves.isEmpty()) {
+    if(dangerSource == null) {
+      List<Animal> wolves = getRegionMngr().getAnimalsInRange(this,
+        a -> a.getDiet() == Diet.CARNIVORE);
+      dangerSource = dangerStrategy.select(this, wolves); //ahora guardo mi lobito
+    }
+
+    //if (!wolves.isEmpty()) {
+    if(dangerSource != null) {
       setState(State.DANGER);
     } else if (getDesire() > DESIRE_THRESHOLD_SHEEP) {
       setState(State.MATE);
