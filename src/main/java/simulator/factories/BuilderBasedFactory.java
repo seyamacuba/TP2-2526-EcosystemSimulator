@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import java.util.*;
 
 public class BuilderBasedFactory<T> implements Factory<T> {
-  private Map<String, Builder<T>> builders;
+  private Map<String, Builder<T>> builders; //Mapa de builders.
   private List<JSONObject> buildersInfo;
 
   public BuilderBasedFactory() {
@@ -31,21 +31,27 @@ public class BuilderBasedFactory<T> implements Factory<T> {
   }
 
   @Override
-  public T createInstance(JSONObject info) {
+  public T createInstance(JSONObject info) { //Devuelveinstancia
     if (info == null) {
       throw new IllegalArgumentException("’info’ cannot be null");
     }
 
-    // Look for a builder with a tag equals to info.getString("type"), in the
-    //  map _builder, and call its createInstance method and return the result
-    // if it is not null. The value you pass to createInstance is the following
-    // because 'data' is optional:
-    //
-    //   info.has("data") ? info.getJSONObject("data") : new JSONObject()
-    // …
+    if(!info.has("type")){
+      throw new IllegalArgumentException("No type found");
+    }
 
-    // If no builder is found or the result is null ...
-    throw new IllegalArgumentException("Unrecognized ‘info’:" + info.toString());
+    String type = info.getString("type"); //Me guarda el tipo del objeto.
+    Builder<T> builder = builders.get(type);
+
+    if(builder == null){ //El objeto no se ha podido crear.
+      throw new IllegalArgumentException("NO EXISTE EL TIPO" + type);
+    }
+
+    try{
+      return builder.createInstance(info);
+    }catch(Exception e){
+      throw new IllegalArgumentException("No se pudo crear la instancia");
+    }
   }
 
   @Override
