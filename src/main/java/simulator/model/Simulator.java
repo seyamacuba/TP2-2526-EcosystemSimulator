@@ -54,6 +54,7 @@ public class Simulator implements JSONable {
   public void addAnimal(JSONObject aJson){
     if(aJson == null){throw new IllegalArgumentException("Null animal JSON");}
     Animal a = animalsFactory.createInstance(aJson); //same que antes no se aiuda
+    addAnimal(a);
   }
 
   //miau
@@ -71,21 +72,30 @@ public class Simulator implements JSONable {
 
   public void advance(double dt){
     if(dt <= 0){throw new IllegalArgumentException("Invalid dt value, must be >0");}
+
+    // Paso 1: incrementar tiempo
     time += dt; //incremento tiempo
 
-    //limpiar muertos NO SE AYUDA
-    //if(a.getState() == State.DEAD) {
-    //    regionMngr.unregisterAnimal(a);
-    //}
+    // Paso 2: quitar animales muertos
+    List<Animal> muertos = new ArrayList<>();
+    for (Animal a : animals) {
+      if (a.getState() == State.DEAD) muertos.add(a);
+    }
+    for (Animal a : muertos) {
+      regionMngr.unregisterAnimal(a);
+      animals.remove(a);
+    }
 
-    //update de cada animal y region
+
+    // Paso 3: actualizar cada animal y su región
     for(Animal a : animals){
       a.update(dt);
       regionMngr.updateanimalRegion(a);
     }
-    //actualizar regiones
+    // Paso 4: actualizar todas las regiones
     regionMngr.updateAllRegions(dt);
-    //para each animal, si pregnant, nace un baby
+
+    // Paso 5: hacer nacer babies
     List<Animal> littlebabies = new ArrayList<>();
     for(Animal a : animals){
       if(a.isPregnant()){
