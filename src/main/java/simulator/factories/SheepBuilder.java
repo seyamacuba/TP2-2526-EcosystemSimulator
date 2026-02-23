@@ -1,14 +1,11 @@
-package simulator.model;
+package simulator.factories;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.factories.Builder;
 import simulator.factories.Factory;
 import simulator.misc.Vector2D;
-import simulator.model.Animal;
-import simulator.model.SelectFirst;
-import simulator.model.SelectionStrategy;
-import simulator.model.Sheep;
+import simulator.model.*;
 
 public class SheepBuilder extends Builder<Animal> {
   private Factory<SelectionStrategy> strategyFactory;
@@ -99,7 +96,7 @@ public class SheepBuilder extends Builder<Animal> {
           JSONObject pos = strategyData.getJSONObject("pos");
           double x = pos.getDouble("x");
           double y = pos.getDouble("y");
-          return new SelectClosest(new Vector2D(x,y));
+          return new SelectClosest();
 
       case "youngest":
         return new SelectYoungest();

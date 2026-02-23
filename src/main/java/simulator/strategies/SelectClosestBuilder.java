@@ -27,7 +27,7 @@ public class SelectClosestBuilder extends Builder<SelectionStrategy> {
       double x = pos.getDouble("x");
       double y = pos.getDouble("y");
 
-      return new SelectClosest(new Vector2D(x,y));
+      return new SelectClosest();
 
     } catch (Exception e){
       throw new IllegalArgumentException("Error al crear el objeto");

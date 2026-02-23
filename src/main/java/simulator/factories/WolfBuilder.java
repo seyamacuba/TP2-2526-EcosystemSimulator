@@ -97,7 +97,7 @@ public class WolfBuilder extends Builder<Animal>{
           JSONObject pos = strategyData.getJSONObject("pos");
           double x = pos.getDouble("x");
           double y = pos.getDouble("y");
-          return new SelectClosest(new Vector2D(x,y));
+          return new SelectClosest();
 
         case "youngest":
           return new SelectYoungest();

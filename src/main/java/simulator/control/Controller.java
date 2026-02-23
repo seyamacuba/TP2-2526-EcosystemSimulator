@@ -1,8 +1,5 @@
 package simulator.control;
 
-public class Controller {
-  package simulator.control;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.factories.Factory;
@@ -102,5 +99,3 @@ import java.nio.charset.StandardCharsets;
       }
     }
   }
-
-}
