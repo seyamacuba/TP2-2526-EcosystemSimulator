@@ -23,7 +23,7 @@ public class Wolf extends Animal {
   private SelectionStrategy huntingStrategy;
   private Animal huntTarget;
 
-  protected Wolf(SelectionStrategy mateStrategy, SelectionStrategy huntingStrategy, Vector2D pos) {
+  public Wolf(SelectionStrategy mateStrategy, SelectionStrategy huntingStrategy, Vector2D pos) {
     super(WOLF_GENETIC_CODE, Diet.CARNIVORE, INIT_SIGHT_WOLF, INIT_SPEED_WOLF, mateStrategy, pos);
     this.huntingStrategy = huntingStrategy;
     this.huntTarget = null;

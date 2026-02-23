@@ -5,26 +5,23 @@ import simulator.misc.Vector2D;
 import java.util.List;
 
 public class SelectClosest implements SelectionStrategy{
-  private Vector2D pos;
-  public SelectClosest(Vector2D pos){
-    if(pos == null) throw new IllegalArgumentException("La posicion no puede ser nula" );
-    this.pos = pos;
+  public SelectClosest(){
   }
 
   @Override
   public Animal select(Animal a, List<Animal> as) {
-    if(!as.isEmpty()){
-      Animal cercano = null;
+    if (as.isEmpty()) return null;
 
-      double distanciaMinima = Double.MAX_VALUE;
-      for(Animal e: as){
-        if(e.getPos().minus(a.getPos()).magnitude() < distanciaMinima){
-          cercano = e;
-        }
+    Animal cercano = null;
+    double distanciaMinima = Double.MAX_VALUE;
+
+    for (Animal e : as) {
+      double d = a.getPosition().distanceTo(e.getPosition());
+      if (d < distanciaMinima) {
+        distanciaMinima = d;
+        cercano = e;
       }
-      return cercano;
-    }else{
-      return null;
     }
+    return cercano;
   }
 }

@@ -20,7 +20,7 @@ public class Sheep extends Animal {
   private Animal dangerSource;
   private SelectionStrategy dangerStrategy;
 
-  protected Sheep(SelectionStrategy mateStrategy, SelectionStrategy dangerStrategy, Vector2D pos) {
+  public Sheep(SelectionStrategy mateStrategy, SelectionStrategy dangerStrategy, Vector2D pos) {
     super(SHEEP_GENETIC_CODE, Diet.HERBIVORE, INIT_SIGHT_SHEEP, INIT_SPEED_SHEEP, mateStrategy, pos);
     this.dangerStrategy = dangerStrategy;
     this.dangerSource = null;
