@@ -110,10 +110,17 @@ public class Simulator implements JSONable {
 
   }
 
+  // ESTO ESTÁ EN TU ARCHIVO: Simulator.java
   public JSONObject asJSON(){
     JSONObject o = new JSONObject();
-    o.put("time", time);
+
+    // 1. Limpiamos el número ANTES de dárselo al JSONObject intocable
+    double tiempoLimpio = Math.round(time * 1000.0) / 1000.0;
+
+    // 2. Le pasamos el número ya limpio
+    o.put("time", tiempoLimpio);
     o.put("state", regionMngr.asJSON());
+
     return o;
   }
   //estructura
