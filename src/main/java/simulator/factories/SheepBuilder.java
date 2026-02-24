@@ -52,7 +52,6 @@ public class SheepBuilder extends Builder<Animal> {
       double xMin = xRange.getDouble(0);
       double xMax = xRange.getDouble(1);
       double yMin = yRange.getDouble(0);
-      //fvfv
       double yMax = yRange.getDouble(1);
 
       // Generar posición aleatoria dentro del rango

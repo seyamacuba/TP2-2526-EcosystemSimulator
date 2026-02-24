@@ -2,10 +2,16 @@ package simulator.control;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import simulator.model.AnimalInfo;
+import simulator.model.MapInfo;
 import simulator.model.Simulator;
+import simulator.view.SimpleObjectViewer;
+import simulator.view.SimpleObjectViewer.ObjInfo;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
 
@@ -21,7 +27,6 @@ public class Controller {
       throw new IllegalArgumentException("Null data");
     }
 
-    // PRIMERO regiones (si las tiene)
     if (data.has("regions")) {
       JSONArray regions = data.getJSONArray("regions");
       for (int i = 0; i < regions.length(); i++) {
@@ -43,7 +48,6 @@ public class Controller {
       }
     }
 
-    // DESPUÉS animales
     if (data.has("animals")) {
       JSONArray animals = data.getJSONArray("animals");
       for (int i = 0; i < animals.length(); i++) {
@@ -58,6 +62,19 @@ public class Controller {
     }
   }
 
+  private List<ObjInfo> toAnimalsInfo(List<? extends AnimalInfo> animals) {
+    List<ObjInfo> ol = new ArrayList<>(animals.size());
+    for (AnimalInfo a : animals) {
+      ol.add(new ObjInfo(
+        a.getGeneticCode(),
+        (int) a.getPosition().getX(),
+        (int) a.getPosition().getY(),
+        (int) Math.round(a.getAge()) + 2
+      ));
+    }
+    return ol;
+  }
+
   public void run(double t, double dt, boolean sv, OutputStream out) {
     if (dt <= 0 || t < 0) {
       throw new IllegalArgumentException("Invalid time or dt");
@@ -65,25 +82,35 @@ public class Controller {
 
     PrintStream p = new PrintStream(out);
 
-    if (sv) {
-      // Vista simple (sv == true): Imprime el estado inicial y luego tras cada avance
-      p.println(sim.asJSON().toString());
-      while (sim.getTime() <= t) {
-        sim.advance(dt);
-        p.println(sim.asJSON().toString());
-      }
-    } else {
-      // Vista detallada (sv == false): Imprime { "in": estado_inicial, "out": estado_final }
-      JSONObject initState = sim.asJSON();
-      while (sim.getTime() <= t) {
-        sim.advance(dt);
-      }
-      JSONObject finalState = sim.asJSON();
+    // Estado inicial — siempre se captura antes del bucle
+    JSONObject initState = sim.asJSON();
 
-      JSONObject result = new JSONObject();
-      result.put("in", initState);
-      result.put("out", finalState);
-      p.println(result.toString());
+    // Inicializar el visor si sv=true
+    SimpleObjectViewer view = null;
+    if (sv) {
+      MapInfo m = sim.getMapInfo();
+      view = new SimpleObjectViewer("[ECOSYSTEM]", m.getWidth(), m.getHeight(), m.getCols(), m.getRows());
+      view.update(toAnimalsInfo(sim.getAnimals()), sim.getTime(), dt);
     }
+
+    // Bucle de simulación — condición uniforme
+    while (sim.getTime() <= t) {
+      sim.advance(dt);
+      if (sv) {
+        view.update(toAnimalsInfo(sim.getAnimals()), sim.getTime(), dt);
+      }
+    }
+
+    // Cerrar el visor
+    if (sv) {
+      view.close();
+    }
+
+    // Salida JSON — siempre en el formato { "in": ..., "out": ... }
+    JSONObject finalState = sim.asJSON();
+    JSONObject result = new JSONObject();
+    result.put("in", initState);
+    result.put("out", finalState);
+    p.println(result.toString());
   }
 }

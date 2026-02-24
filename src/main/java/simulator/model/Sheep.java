@@ -184,8 +184,6 @@ public class Sheep extends Animal {
         if (getBaby() == null && Utils.RAND.nextDouble() < PREGNANT_PROBABILITY_SHEEP) {
           setBaby(new Sheep(this, getMateTarget()));
         }
-
-        setEnergy(limit(getEnergy() - 10.0, 0.0, MAX_ENERGY));
         setMateTarget(null);
       }
     }
