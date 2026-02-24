@@ -1,4 +1,6 @@
-package simulator.model;
+package simulator.strategies;
+
+import simulator.model.Animal;
 
 import java.util.List;
 

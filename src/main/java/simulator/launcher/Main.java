@@ -1,8 +1,8 @@
 package simulator.launcher;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -27,7 +27,7 @@ import simulator.factories.WolfBuilder;
 import simulator.misc.Utils;
 import simulator.model.Animal;
 import simulator.model.Region;
-import simulator.model.SelectionStrategy;
+import simulator.strategies.SelectionStrategy;
 import simulator.model.Simulator;
 import simulator.misc.Utils;
 
@@ -86,7 +86,7 @@ public class Main {
       CommandLine line = parser.parse(cmdLineOptions, args);
       parseHelpOption(line, cmdLineOptions);
       parseInFileOption(line);
-      porseOutFileOption(line);
+      parseOutFileOption(line);
       parseTimeOption(line);
       parseDeltaTimeOption(line);
       parseSimpleViewerOption(line);

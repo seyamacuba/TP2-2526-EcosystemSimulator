@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.misc.Utils;
 import simulator.misc.Vector2D;
+import simulator.strategies.SelectionStrategy;
 
 import java.util.List;
 import java.util.Vector;

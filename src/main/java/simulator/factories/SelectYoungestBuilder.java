@@ -1,9 +1,9 @@
-package simulator.strategies;
+package simulator.factories;
 
 import org.json.JSONObject;
 import simulator.factories.Builder;
-import simulator.model.SelectYoungest;
-import simulator.model.SelectionStrategy;
+import simulator.strategies.SelectYoungest;
+import simulator.strategies.SelectionStrategy;
 
 public class SelectYoungestBuilder extends Builder<SelectionStrategy> {
 
@@ -16,7 +16,4 @@ public class SelectYoungestBuilder extends Builder<SelectionStrategy> {
     return new SelectYoungest();
   }
 
-  @Override
-  protected void fillInData(JSONObject o) {
-  }
 }

@@ -1,17 +1,13 @@
-package simulator.strategies;
+package simulator.factories;
 
 import org.json.JSONObject;
 import simulator.factories.Builder;
-import simulator.model.SelectFirst;
-import simulator.model.SelectionStrategy;
+import simulator.strategies.SelectFirst;
+import simulator.strategies.SelectionStrategy;
 
 public class SelectFirstBuilder extends Builder<SelectionStrategy> {
   public SelectFirstBuilder() {
-    super("first", " ");
-  }
-
-  @Override
-  protected void fillInData(JSONObject o) {
+    super("first", "First animal selection strategy ");
   }
 
   @Override

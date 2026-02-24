@@ -1,10 +1,12 @@
-package simulator.model;
+package simulator.strategies;
 
 import simulator.misc.Vector2D;
+import simulator.model.Animal;
+import simulator.strategies.SelectionStrategy;
 
 import java.util.List;
 
-public class SelectClosest implements SelectionStrategy{
+public class SelectClosest implements SelectionStrategy {
   public SelectClosest(){
   }
 

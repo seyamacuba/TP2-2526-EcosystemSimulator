@@ -4,6 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.misc.Vector2D;
 import simulator.model.*;
+import simulator.strategies.SelectFirst;
+import simulator.strategies.SelectClosest;
+import simulator.strategies.SelectYoungest;
+import simulator.strategies.SelectionStrategy;
 import simulator.model.Wolf;
 
 
@@ -16,96 +20,67 @@ public class WolfBuilder extends Builder<Animal>{
     this.strategyFactory = strategyFactory;
   }
 
-  private Vector2D createRandomPosition(JSONObject posData){
-    if(!posData.has("min") || !posData.has("max")){
-      throw new IllegalArgumentException("Maximum and minimun needed");
-    }
-
-    JSONArray xRange = posData.getJSONArray("x_range");
-    JSONArray yRange = posData.getJSONArray("y_range");
-
-    if(xRange.length() != 2 || yRange.length() != 2){
-      throw new IllegalArgumentException("Range must have two elems");
-    }
-
-    double xMin = xRange.getDouble(0);
-    double xMax = xRange.getDouble(1);
-    double yMin = yRange.getDouble(0);
-    double yMax = yRange.getDouble(1);
-
-    if(xMin > xMax || yMin > yMax){
-      throw new IllegalArgumentException("Incorrect range");
-    }
-
-    double x = xMin + Math.random() * (xMax - xMin); //Genera las coordenadas aleatorias en el rango.
-    double y = yMin + Math.random() * (yMax - yMin);
-
-    return new Vector2D(x, y);
-  }
-
     @Override
     protected Animal createInstance(JSONObject data) {
-      if(!data.has("pos")){
-        throw new IllegalArgumentException("JSON must contain position");
+      // 1. POSICIÓN (O es un array exacto [x,y] o es null)
+      Vector2D position = null;
+      if (data.has("pos")) {
+        JSONArray posArray = data.getJSONArray("pos");
+        position = new Vector2D(posArray.getDouble(0), posArray.getDouble(1));
       }
 
-      try{
-        Vector2D posicion = null;
-        if(data.has("pos")){
-          JSONObject posData = data.getJSONObject("pos");
-          posicion = createRandomPosition(posData);
-        }
-
-        SelectionStrategy mateStrategy; //Hace mateStrategy
-        if(data.has("mate_strategy")){
-          JSONObject dangerData = data.getJSONObject("mate_strategy");
-          mateStrategy = createSelectionStrategy(dangerData);
-        }else{
-          mateStrategy = new SelectFirst(); //Por defecto lo he puesto
-        }
-
-        SelectionStrategy huntStrategy;
-        if(data.has("hunt_strategy")){
-          JSONObject dangerData = data.getJSONObject("hunt_strategy");
-          huntStrategy = createSelectionStrategy(dangerData);
-        }else{
-          huntStrategy = new SelectFirst();
-        }
-
-        return new Wolf(mateStrategy,huntStrategy,posicion);
-
-      } catch (Exception e){
-        throw new IllegalArgumentException("Error creating object");
+      // 2. ESTRATEGIA MATE
+      SelectionStrategy mateStrategy;
+      if (data.has("mate_strategy")) {
+        mateStrategy = strategyFactory.createInstance(data.getJSONObject("mate_strategy"));
+      } else {
+        // Valor por defecto: SelectFirst
+        JSONObject defaultMate = new JSONObject();
+        defaultMate.put("type", "first");
+        mateStrategy = strategyFactory.createInstance(defaultMate);
       }
+
+      // 3. ESTRATEGIA HUNT
+      SelectionStrategy huntStrategy;
+      if (data.has("hunt_strategy")) {
+        huntStrategy = strategyFactory.createInstance(data.getJSONObject("hunt_strategy"));
+      } else {
+        // Valor por defecto: SelectFirst
+        JSONObject defaultHunt = new JSONObject();
+        defaultHunt.put("type", "first");
+        huntStrategy = strategyFactory.createInstance(defaultHunt);
+      }
+
+      return new Wolf(mateStrategy, huntStrategy, position);
     }
-
-    private SelectionStrategy createSelectionStrategy(JSONObject strategyData) {
-      if(!strategyData.has("type")){
-        throw new IllegalArgumentException("Must have a type of strategy");
-      }
-
-      String type = strategyData.getString("type");
-
-      switch(type){
-        case "first":
-          return new SelectFirst();
-
-        case "closest":
-          if(!strategyData.has("pos")){
-            throw new IllegalArgumentException("closest type needs a position");
-          }
-          JSONObject pos = strategyData.getJSONObject("pos");
-          double x = pos.getDouble("x");
-          double y = pos.getDouble("y");
-          return new SelectClosest();
-
-        case "youngest":
-          return new SelectYoungest();
-
-        default:
-          throw new IllegalArgumentException("Strategy does not exist: " + type);
-      }
-    }
+//Para que tenemos las factorias? esto no tiene sentido
+//    private SelectionStrategy createSelectionStrategy(JSONObject strategyData) {
+//      if(!strategyData.has("type")){
+//        throw new IllegalArgumentException("Must have a type of strategy");
+//      }
+//
+//      String type = strategyData.getString("type");
+//
+//      switch(type){
+//        case "first":
+//          return new SelectFirst();
+//
+//        case "closest":
+//          if(!strategyData.has("pos")){
+//            throw new IllegalArgumentException("closest type needs a position");
+//          }
+//          JSONObject pos = strategyData.getJSONObject("pos");
+//          double x = pos.getDouble("x");
+//          double y = pos.getDouble("y");
+//          return new SelectClosest();
+//
+//        case "youngest":
+//          return new SelectYoungest();
+//
+//        default:
+//          throw new IllegalArgumentException("Strategy does not exist: " + type);
+//      }
+//    }
 
     @Override
     protected  void fillInData(JSONObject o) {

@@ -1,8 +1,11 @@
-package simulator.model;
+package simulator.strategies;
+
+import simulator.model.Animal;
+import simulator.strategies.SelectionStrategy;
 
 import java.util.List;
 
-public class SelectYoungest implements SelectionStrategy{
+public class SelectYoungest implements SelectionStrategy {
   @Override
   public Animal select(Animal a, List<Animal> as) {
     if(!as.isEmpty()){

@@ -2,10 +2,10 @@ package simulator.factories;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import simulator.factories.Builder;
-import simulator.factories.Factory;
 import simulator.misc.Vector2D;
 import simulator.model.*;
+import simulator.strategies.SelectionStrategy;
+import simulator.strategies.*;
 
 public class SheepBuilder extends Builder<Animal> {
   private Factory<SelectionStrategy> strategyFactory;
@@ -14,102 +14,73 @@ public class SheepBuilder extends Builder<Animal> {
     this.strategyFactory = strategyFactory;
   }
 
-  private Vector2D createRandomPosition(JSONObject posData){
-    if(!posData.has("min") || !posData.has("max")){
-      throw new IllegalArgumentException("Se necesitan los minimos y maximos");
-    }
-
-    JSONArray xRange = posData.getJSONArray("x_range");
-    JSONArray yRange = posData.getJSONArray("y_range");
-
-    if(xRange.length() != 2 || yRange.length() != 2){
-      throw new IllegalArgumentException("Los rangos deben tener dos elementos");
-    }
-
-    double xMin = xRange.getDouble(0);
-    double xMax = xRange.getDouble(1);
-    double yMin = yRange.getDouble(0);
-    double yMax = yRange.getDouble(1);
-
-    if(xMin > xMax || yMin > yMax){
-      throw new IllegalArgumentException("Rango incorrecto");
-    }
-
-    double x = xMin + Math.random() * (xMax - xMin); //Genera las coordenadas aleatorias en el rango.
-    double y = yMin + Math.random() * (yMax - yMin);
-
-    return new Vector2D(x, y);
-  }
+//  private Vector2D createRandomPosition(JSONObject posData){
+//    if(!posData.has("min") || !posData.has("max")){
+//      throw new IllegalArgumentException("Se necesitan los minimos y maximos");
+//    }
+//
+//    JSONArray xRange = posData.getJSONArray("x_range");
+//    JSONArray yRange = posData.getJSONArray("y_range");
+//
+//    if(xRange.length() != 2 || yRange.length() != 2){
+//      throw new IllegalArgumentException("Los rangos deben tener dos elementos");
+//    }
+//
+//    double xMin = xRange.getDouble(0);
+//    double xMax = xRange.getDouble(1);
+//    double yMin = yRange.getDouble(0);
+//    double yMax = yRange.getDouble(1);
+//
+//    if(xMin > xMax || yMin > yMax){
+//      throw new IllegalArgumentException("Rango incorrecto");
+//    }
+//
+//    double x = xMin + Math.random() * (xMax - xMin); //Genera las coordenadas aleatorias en el rango.
+//    double y = yMin + Math.random() * (yMax - yMin);
+//
+//    return new Vector2D(x, y);
+//  }
   @Override
   protected Animal createInstance(JSONObject data) {
-    if(!data.has("pos")){
-      throw new IllegalArgumentException("El JSON debe contener pos");
+    // 1. POSICIÓN (O es un array exacto [x,y] o es null)
+    Vector2D position = null;
+    if (data.has("pos")) {
+      JSONArray posArray = data.getJSONArray("pos");
+      position = new Vector2D(posArray.getDouble(0), posArray.getDouble(1));
     }
 
-    try{
-
-      Vector2D posicion = null;
-      if(data.has("pos")){
-        JSONObject posData = data.getJSONObject("pos");
-        posicion = createRandomPosition(posData);
-      }
-
-      SelectionStrategy mateStrategy; //Hace mateStrategy
-      if(data.has("mate_strategy")){
-        JSONObject dangerData = data.getJSONObject("mate_strategy");
-        mateStrategy = createSelectionStrategy(dangerData);
-      }else{
-        mateStrategy = new SelectFirst(); //Por defecto lo he puesto
-      }
-
-      SelectionStrategy dangerStrategy;
-      if(data.has("danger_strategy")){
-        JSONObject dangerData = data.getJSONObject("danger_strategy");
-        dangerStrategy = createSelectionStrategy(dangerData);
-      }else{
-        dangerStrategy = new SelectFirst();
-      }
-
-      return new Sheep(mateStrategy,dangerStrategy,posicion);
-
-    } catch (Exception e){
-      throw new IllegalArgumentException("Error al crear el objeto");
-    }
-  }
-
-
-  private SelectionStrategy createSelectionStrategy(JSONObject strategyData) {
-    if(!strategyData.has("type")){
-      throw new IllegalArgumentException("Debe tener un tipo de estrategia");
+    // 2. ESTRATEGIA MATE
+    SelectionStrategy mateStrategy;
+    if (data.has("mate_strategy")) {
+      mateStrategy = strategyFactory.createInstance(data.getJSONObject("mate_strategy"));
+    } else {
+      // Valor por defecto: SelectFirst
+      JSONObject defaultMate = new JSONObject();
+      defaultMate.put("type", "first");
+      mateStrategy = strategyFactory.createInstance(defaultMate);
     }
 
-    String type = strategyData.getString("type");
 
-    switch(type){
-      case "first":
-        return new SelectFirst();
-
-      case "closest":
-          if(!strategyData.has("pos")){
-            throw new IllegalArgumentException("El tipo closest necesita una posicion");
-          }
-          JSONObject pos = strategyData.getJSONObject("pos");
-          double x = pos.getDouble("x");
-          double y = pos.getDouble("y");
-          return new SelectClosest();
-
-      case "youngest":
-        return new SelectYoungest();
-      default:
-        throw new IllegalArgumentException("Esa estrategia no existe" + type);
+    // 3. ESTRATEGIA DANGER
+    SelectionStrategy dangerStrategy;
+    if (data.has("danger_strategy")) {
+      dangerStrategy = strategyFactory.createInstance(data.getJSONObject("danger_strategy"));
+    } else {
+      // Valor por defecto: SelectFirst
+      JSONObject defaultDanger = new JSONObject();
+      defaultDanger.put("type", "first");
+      dangerStrategy = strategyFactory.createInstance(defaultDanger);
     }
-  }
+
+      return new Sheep(mateStrategy,dangerStrategy,position);
+
+    }
 
   @Override
   protected  void fillInData(JSONObject o) {
-    o.put("pos", "posicion JSONObject con coordenadas x e y");
-    o.put("mate_strategy", "mating strategy (JSONObject)");
-    o.put("sel_strategy", "selection strategy (JSONObject)");
+    o.put("pos", "posicion opcional como array de dos double [x, y]");
+    o.put("mate_strategy", "estrategia de apareamiento opcional (JSONObject)");
+    o.put("sel_strategy", "estrategia de peligro opcional (JSONObject)");
   }
 
 }

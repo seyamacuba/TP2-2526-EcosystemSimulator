@@ -2,6 +2,7 @@ package simulator.model;
 
 import simulator.misc.Utils;
 import simulator.misc.Vector2D;
+import simulator.strategies.*;
 
 import java.util.List;
 
@@ -87,8 +88,9 @@ public class Sheep extends Animal {
   private void updateNormal(double dt) {
     // Moverse
     if (getDest() == null || getPos().distanceTo(getDest()) < COLLISION_RANGE) {
-      setDest(Vector2D.get_random_vector(0, getRegionMngr().getWidth() - 1)
-        .plus(Vector2D.get_random_vector(0, getRegionMngr().getHeight() - 1)));
+      double dx = Utils.RAND.nextDouble() * (getRegionMngr().getWidth() - 1);
+      double dy = Utils.RAND.nextDouble() * (getRegionMngr().getHeight() - 1);
+      setDest(new Vector2D(dx, dy));
     }
 
     double speed = INIT_SPEED_SHEEP * dt * Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
@@ -131,21 +133,22 @@ public class Sheep extends Animal {
       double speed = BOOST_FACTOR_SHEEP * INIT_SPEED_SHEEP * dt *
         Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
       move(speed);
+      updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
     } else {
       // Huir del peligro
       setDest(getPos().minus(dangerSource.getPos().minus(getPos())));
       double speed = calculateSpeed(INIT_SPEED_SHEEP * dt, BOOST_FACTOR_SHEEP);
       move(speed);
+      updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * FOOD_DROP_BOOST_FACTOR_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
     }
 
-    // Actualizar atributos
-    updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
-
     // Cambio de estado
-    List<Animal> wolves = getRegionMngr().getAnimalsInRange(this,
-      a -> a.getDiet() == Diet.CARNIVORE);
-    if (wolves.isEmpty()) {
-      setState(State.NORMAL);
+    if (dangerSource == null) {
+      if (getDesire() < DESIRE_THRESHOLD_SHEEP) {
+        setState(State.NORMAL);
+      } else {
+        setState(State.MATE);
+      }
     }
   }
 
@@ -166,13 +169,14 @@ public class Sheep extends Animal {
       double speed = BOOST_FACTOR_SHEEP * INIT_SPEED_SHEEP * dt *
         Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
       move(speed);
+      updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
     } else {
       // Ir hacia la pareja
       setDest(getMateTarget().getPos());
       double speed = BOOST_FACTOR_SHEEP * INIT_SPEED_SHEEP * dt *
         Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
       move(speed);
-
+      updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * FOOD_DROP_BOOST_FACTOR_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
       // Si está cerca, reproducirse
       if (getPos().distanceTo(getMateTarget().getPos()) < COLLISION_RANGE) {
         setDesire(0.0);
@@ -187,8 +191,6 @@ public class Sheep extends Animal {
       }
     }
 
-    // Actualizar atributos
-    updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
 
     // Cambios de estado
     List<Animal> wolves = getRegionMngr().getAnimalsInRange(this,

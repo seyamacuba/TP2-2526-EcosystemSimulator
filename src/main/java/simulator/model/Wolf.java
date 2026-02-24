@@ -2,6 +2,8 @@ package simulator.model;
 
 import simulator.misc.Vector2D;
 import simulator.misc.Utils;
+import simulator.strategies.*;
+import simulator.strategies.SelectionStrategy;
 
 import java.util.List;
 
@@ -88,8 +90,8 @@ private void updateNormal(double dt){
   double distancia = distanciaVector.magnitude();
 
   if(distancia < COLLISION_RANGE){
-    double randomX = Utils.RAND.nextDouble() * getRegionMngr().getWidth();
-    double randomY = Utils.RAND.nextDouble() * getRegionMngr().getHeight();
+    double randomX = Utils.RAND.nextDouble() * (getRegionMngr().getWidth() -1);
+    double randomY = Utils.RAND.nextDouble() * (getRegionMngr().getHeight() -1);
     this.setDest(new Vector2D(randomX, randomY)); //Te faltaba la Y
   }
   double velocidad = INIT_SPEED_WOLF*dt*Math.exp((getEnergy()-100.0) * 0.007);
@@ -119,6 +121,7 @@ private void updateHunger(double dt){
     //No hay presas, moverse normal
     double velocidad = INIT_SPEED_WOLF*dt*Math.exp((getEnergy()-100.0) * 0.007);
     move(velocidad); //Avanzo
+    updateBasicAttributes(dt, FOOD_DROP_RATE_WOLF * dt, DESIRE_INCREASE_RATE_WOLF * dt);
   }else{
     //Perseguir presa
     this.setDest(huntTarget.getPos());
@@ -162,11 +165,12 @@ private void updateMate(double dt){
     //Si sigue siendo nulo, avanza.
     double velocidad = 3.0 * INIT_SPEED_WOLF * dt * Math.exp((getEnergy() - 100.0) * 0.007);
     move(velocidad);
+    updateBasicAttributes(dt, FOOD_DROP_RATE_WOLF * dt, DESIRE_INCREASE_RATE_WOLF * dt);
   }else{
     setDest(getMateTarget().getPos());
     double velocidad = 3.0 * INIT_SPEED_WOLF * dt * Math.exp((getEnergy() - 100.0) * 0.007);
     move(velocidad);
-    updateBasicAttributes(dt, FOOD_DROP_RATE_WOLF * dt, DESIRE_INCREASE_RATE_WOLF * dt);
+    updateBasicAttributes(dt, FOOD_DROP_RATE_WOLF * FOOD_DROP_BOOST_FACTOR_WOLF * dt, DESIRE_INCREASE_RATE_WOLF * dt);
 
     Vector2D distanciaMate = getMateTarget().getPos().minus(getPos());
 
