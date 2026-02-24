@@ -2,8 +2,6 @@ package simulator.model;
 
 import simulator.misc.Vector2D;
 import simulator.misc.Utils;
-import simulator.strategies.*;
-import simulator.strategies.SelectionStrategy;
 
 import java.util.List;
 

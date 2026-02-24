@@ -4,8 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.misc.Vector2D;
 import simulator.model.*;
-import simulator.strategies.SelectionStrategy;
-import simulator.strategies.*;
+import simulator.model.SelectionStrategy;
 
 public class SheepBuilder extends Builder<Animal> {
   private Factory<SelectionStrategy> strategyFactory;

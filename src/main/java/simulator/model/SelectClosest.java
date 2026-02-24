@@ -1,8 +1,4 @@
-package simulator.strategies;
-
-import simulator.misc.Vector2D;
-import simulator.model.Animal;
-import simulator.strategies.SelectionStrategy;
+package simulator.model;
 
 import java.util.List;
 

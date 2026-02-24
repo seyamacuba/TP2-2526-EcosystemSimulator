@@ -4,10 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.misc.Vector2D;
 import simulator.model.*;
-import simulator.strategies.SelectFirst;
-import simulator.strategies.SelectClosest;
-import simulator.strategies.SelectYoungest;
-import simulator.strategies.SelectionStrategy;
+import simulator.model.SelectionStrategy;
 import simulator.model.Wolf;
 
 
