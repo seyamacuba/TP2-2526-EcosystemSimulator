@@ -117,6 +117,7 @@ private void updateHunger(double dt){
 
   if(this.huntTarget == null){
     //No hay presas, moverse normal
+    clearDestinationOrRandom();//bug animales bailarines
     double velocidad = INIT_SPEED_WOLF*dt*Math.exp((getEnergy()-100.0) * 0.007);
     move(velocidad); //Avanzo
     updateBasicAttributes(dt, FOOD_DROP_RATE_WOLF * dt, DESIRE_INCREASE_RATE_WOLF * dt);
@@ -161,6 +162,7 @@ private void updateMate(double dt){
     //Tras la asignación
   if(getMateTarget() == null){
     //Si sigue siendo nulo, avanza.
+    clearDestinationOrRandom();
     double velocidad = 3.0 * INIT_SPEED_WOLF * dt * Math.exp((getEnergy() - 100.0) * 0.007);
     move(velocidad);
     updateBasicAttributes(dt, FOOD_DROP_RATE_WOLF * dt, DESIRE_INCREASE_RATE_WOLF * dt);

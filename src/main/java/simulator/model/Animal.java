@@ -292,6 +292,17 @@ public abstract class Animal implements Entity,AnimalInfo {
     pos = pos.plus(dest.minus(pos).direction().scale(speed));
   }
 
+  //Para el bug de los animales que vibran, tenian un dest, se movian pero luego se movian para el mismo dest
+  //se buguea en  Sheep updateDanger cuando no hay danger, en Wolf updateHunger cuando no hay presa y en ambos en  updateMate cuando no hay pareja
+  //vamos cuando target es null
+  protected void clearDestinationOrRandom() { //no se me ocurre nombre bonito
+    if (getDestination() == null || getPosition().distanceTo(getDestination()) < COLLISION_RANGE) { //si estoy MUY cerca nuevo dest random
+      double dx = Utils.RAND.nextDouble() * (regionMngr.getWidth() - 1);
+      double dy = Utils.RAND.nextDouble() * (regionMngr.getHeight() - 1);
+      setDest(new Vector2D(dx, dy));
+    }
+  }
+
   @Override
   public JSONObject asJSON() { //CORREGIR.
     JSONObject obj = new JSONObject();

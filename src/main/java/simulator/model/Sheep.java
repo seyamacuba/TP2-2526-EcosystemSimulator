@@ -129,6 +129,7 @@ public class Sheep extends Animal {
 
     if (dangerSource == null) {
       // No hay peligro, volver a NORMAL
+      clearDestinationOrRandom();
       double speed = BOOST_FACTOR_SHEEP * INIT_SPEED_SHEEP * dt *
         Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
       move(speed);
@@ -165,6 +166,7 @@ public class Sheep extends Animal {
 
     if (getMateTarget() == null) {
       // No hay pareja
+      clearDestinationOrRandom();
       double speed = BOOST_FACTOR_SHEEP * INIT_SPEED_SHEEP * dt *
         Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
       move(speed);
