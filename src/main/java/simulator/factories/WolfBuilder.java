@@ -26,7 +26,7 @@ public class WolfBuilder extends Builder<Animal>{
 
         JSONArray xRange = pos.getJSONArray("x_range");
         JSONArray yRange = pos.getJSONArray("y_range");
-
+        //dfkvnjkdv
         double xMin = xRange.getDouble(0);
         double xMax = xRange.getDouble(1);
         double yMin = yRange.getDouble(0);
