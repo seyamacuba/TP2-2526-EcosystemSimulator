@@ -22,8 +22,21 @@ public class WolfBuilder extends Builder<Animal>{
       // 1. POSICIÓN (O es un array exacto [x,y] o es null)
       Vector2D position = null;
       if (data.has("pos")) {
-        JSONArray posArray = data.getJSONArray("pos");
-        position = new Vector2D(posArray.getDouble(0), posArray.getDouble(1));
+        JSONObject pos = data.getJSONObject("pos");
+
+        JSONArray xRange = pos.getJSONArray("x_range");
+        JSONArray yRange = pos.getJSONArray("y_range");
+
+        double xMin = xRange.getDouble(0);
+        double xMax = xRange.getDouble(1);
+        double yMin = yRange.getDouble(0);
+        double yMax = yRange.getDouble(1);
+
+        // Generar posición aleatoria dentro del rango
+        double x = xMin + Math.random() * (xMax - xMin);
+        double y = yMin + Math.random() * (yMax - yMin);
+
+        position = new Vector2D(x, y);
       }
 
       // 2. ESTRATEGIA MATE
