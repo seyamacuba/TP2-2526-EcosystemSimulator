@@ -81,10 +81,11 @@ public class RegionManager implements AnimalMapView{
     return regions[fila][columna];
   }
   void registerAnimal(Animal a){ //x e y son iguales a pixeles.
+    a.init(this); //Seteo el regionManager el animal como el actual.
     Region actual = getRegion(a.getPos().getX(), a.getPos().getY()); //Obtengo la region a la que pertenece el animal.
     actual.addAnimal(a); //Lo añade a la región.
     animalRegion.put(a, actual); //Guarda la relación animal - región.
-    a.init(this); //Seteo el regionManager el animal como el actual.
+
   }
 
   //encuentra la región a la que tiene que pertenecer el animal (a partir de su posición) y lo añade a esa región y actualiza animalRegion. Además, llama al método init pasándole una referencia a sí mismo (el gestor de regiones).
