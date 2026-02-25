@@ -1,7 +1,6 @@
 package simulator.factories;
 
 import org.json.JSONObject;
-import simulator.factories.Builder;
 import simulator.model.DefaultRegion;
 import simulator.model.Region;
 
@@ -12,10 +11,10 @@ public class DefaultRegionBuilder extends Builder<Region> {
 
   @Override
   protected Region createInstance(JSONObject data) {
-    try{
+    try {
       //Para una region por defecto no hace falta nada.
       return new DefaultRegion();
-    } catch (Exception e){
+    } catch (Exception e) {
       throw new IllegalArgumentException("Error creando el objeto");
     }
   }

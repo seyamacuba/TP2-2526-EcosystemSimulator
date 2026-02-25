@@ -1,15 +1,15 @@
 package simulator.model;
 
 public interface MapInfo extends JSONable {
-  public int getCols();
+  int getCols();
 
-  public int getRows();
+  int getRows();
 
-  public int getWidth();
+  int getWidth();
 
-  public int getHeight();
+  int getHeight();
 
-  public int getRegionWidth();
+  int getRegionWidth();
 
-  public int getRegionHeight();
+  int getRegionHeight();
 }

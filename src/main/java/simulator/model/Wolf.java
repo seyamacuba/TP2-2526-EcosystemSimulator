@@ -58,16 +58,14 @@ public class Wolf extends Animal {
       case HUNGER -> updateHunger(dt);
     }
 
-    //SI esta fuera del mapa, ajusta y cambia a normal.
-    if(getPos().getX() >= getRegionMngr().getWidth() || getPos().getX() < 0 ||
-      getPos().getY() >= getRegionMngr().getHeight() || getPos().getY() < 0){
+    if (getPos().getX() < 0 || getPos().getX() >= getRegionMngr().getWidth() ||
+      getPos().getY() < 0 || getPos().getY() >= getRegionMngr().getHeight()) {
 
-      double xAjustada = limit(getPos().getX(), 0, getRegionMngr().getWidth()-1);
-      double yAjustada = limit(getPos().getY(), 0, getRegionMngr().getHeight()-1);
+      // Usar adjustPos
+      setPos(adjustPos(getPos(), getRegionMngr().getWidth(), getRegionMngr().getHeight()));
 
-      setPos(new Vector2D(xAjustada, yAjustada)); //Lo he cambiado para que este en una linea
+      setState(State.NORMAL); //  Cambiar estado a NORMAL
 
-      setState(State.NORMAL);
     }
 
     //Si ya no tiene ganas de vivir o ya esta fosil, apaga y vamonos
@@ -84,14 +82,8 @@ public class Wolf extends Animal {
 
   //Lista de updates, aunque yo lo pondria en animal, porque sheep tmb va a usar esto.
 private void updateNormal(double dt){
-  Vector2D distanciaVector = this.getDestination().minus(this.getPos()); //Obtengo la diferencia
-  double distancia = distanciaVector.magnitude();
+  clearDestinationOrRandom();
 
-  if(distancia < COLLISION_RANGE){
-    double randomX = Utils.RAND.nextDouble() * (getRegionMngr().getWidth() -1);
-    double randomY = Utils.RAND.nextDouble() * (getRegionMngr().getHeight() -1);
-    this.setDest(new Vector2D(randomX, randomY)); //Te faltaba la Y
-  }
   double velocidad = INIT_SPEED_WOLF*dt*Math.exp((getEnergy()-100.0) * 0.007);
   move(velocidad);
 

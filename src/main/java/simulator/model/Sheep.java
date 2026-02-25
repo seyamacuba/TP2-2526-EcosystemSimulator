@@ -18,7 +18,7 @@ public class Sheep extends Animal {
   final static double PREGNANT_PROBABILITY_SHEEP = 0.9;
 
   private Animal dangerSource;
-  private SelectionStrategy dangerStrategy;
+  private final SelectionStrategy dangerStrategy;
 
   public Sheep(SelectionStrategy mateStrategy, SelectionStrategy dangerStrategy, Vector2D pos) {
     super(SHEEP_GENETIC_CODE, Diet.HERBIVORE, INIT_SIGHT_SHEEP, INIT_SPEED_SHEEP, mateStrategy, pos);
@@ -63,14 +63,13 @@ public class Sheep extends Animal {
       case MATE -> updateMate(dt);
     }
 
-    // Ajustar si se sale del mapa
     if (getPos().getX() < 0 || getPos().getX() >= getRegionMngr().getWidth() ||
       getPos().getY() < 0 || getPos().getY() >= getRegionMngr().getHeight()) {
 
-      double newX = limit(getPos().getX(), 0, getRegionMngr().getWidth() - 1);
-      double newY = limit(getPos().getY(), 0, getRegionMngr().getHeight() - 1);
-      setPos(new Vector2D(newX, newY));
-      setState(State.NORMAL);
+      // Usar adjustPos
+      setPos(adjustPos(getPos(), getRegionMngr().getWidth(), getRegionMngr().getHeight()));
+
+      setState(State.NORMAL); //  Cambiar estado a NORMAL
     }
 
     if (this.getEnergy() == 0.0 || getAge() > MAX_AGE_SHEEP) {
@@ -86,12 +85,7 @@ public class Sheep extends Animal {
 
   private void updateNormal(double dt) {
     // Moverse
-    if (getDest() == null || getPos().distanceTo(getDest()) < COLLISION_RANGE) {
-      double dx = Utils.RAND.nextDouble() * (getRegionMngr().getWidth() - 1);
-      double dy = Utils.RAND.nextDouble() * (getRegionMngr().getHeight() - 1);
-      setDest(new Vector2D(dx, dy));
-    }
-
+    clearDestinationOrRandom();
     double speed = INIT_SPEED_SHEEP * dt * Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
     move(speed);
 
@@ -99,14 +93,14 @@ public class Sheep extends Animal {
     updateBasicAttributes(dt, FOOD_DROP_RATE_SHEEP * dt, DESIRE_INCREASE_RATE_SHEEP * dt);
 
     // Cambios de estado
-    if(dangerSource == null) {
+    if (dangerSource == null) {
       List<Animal> wolves = getRegionMngr().getAnimalsInRange(this,
         a -> a.getDiet() == Diet.CARNIVORE);
       dangerSource = dangerStrategy.select(this, wolves); //ahora guardo mi lobito
     }
 
     //if (!wolves.isEmpty()) {
-    if(dangerSource != null) {
+    if (dangerSource != null) {
       setState(State.DANGER);
     } else if (getDesire() > DESIRE_THRESHOLD_SHEEP) {
       setState(State.MATE);

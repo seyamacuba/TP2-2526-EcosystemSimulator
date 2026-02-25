@@ -3,8 +3,8 @@ package simulator.factories;
 import org.json.JSONObject;
 
 public abstract class Builder<T> {
-  private String typeTag;
-  private String desc;
+  private final String typeTag;
+  private final String desc;
 
   public Builder(String typeTag, String desc) {
     if (typeTag == null || desc == null || typeTag.isBlank() || desc.isBlank())
@@ -34,5 +34,6 @@ public abstract class Builder<T> {
   public String toString() {
     return desc;
   }
+
   protected abstract T createInstance(JSONObject data);
 }

@@ -3,7 +3,7 @@ package simulator.model;
 import java.util.List;
 
 public class SelectClosest implements SelectionStrategy {
-  public SelectClosest(){
+  public SelectClosest() {
   }
 
   @Override

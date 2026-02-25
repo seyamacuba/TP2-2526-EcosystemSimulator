@@ -2,43 +2,20 @@ package simulator.factories;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import simulator.misc.Utils;
 import simulator.misc.Vector2D;
-import simulator.model.*;
+import simulator.model.Animal;
 import simulator.model.SelectionStrategy;
+import simulator.model.Sheep;
 
 public class SheepBuilder extends Builder<Animal> {
-  private Factory<SelectionStrategy> strategyFactory;
+  private final Factory<SelectionStrategy> strategyFactory;
+
   public SheepBuilder(Factory<SelectionStrategy> strategyFactory) {
     super("sheep", "Sheep animal");
     this.strategyFactory = strategyFactory;
   }
 
-//  private Vector2D createRandomPosition(JSONObject posData){
-//    if(!posData.has("min") || !posData.has("max")){
-//      throw new IllegalArgumentException("Se necesitan los minimos y maximos");
-//    }
-//
-//    JSONArray xRange = posData.getJSONArray("x_range");
-//    JSONArray yRange = posData.getJSONArray("y_range");
-//
-//    if(xRange.length() != 2 || yRange.length() != 2){
-//      throw new IllegalArgumentException("Los rangos deben tener dos elementos");
-//    }
-//
-//    double xMin = xRange.getDouble(0);
-//    double xMax = xRange.getDouble(1);
-//    double yMin = yRange.getDouble(0);
-//    double yMax = yRange.getDouble(1);
-//
-//    if(xMin > xMax || yMin > yMax){
-//      throw new IllegalArgumentException("Rango incorrecto");
-//    }
-//
-//    double x = xMin + Math.random() * (xMax - xMin); //Genera las coordenadas aleatorias en el rango.
-//    double y = yMin + Math.random() * (yMax - yMin);
-//
-//    return new Vector2D(x, y);
-//  }
   @Override
   protected Animal createInstance(JSONObject data) {
     // 1. POSICIÓN (O es un array exacto [x,y] o es null)
@@ -55,8 +32,8 @@ public class SheepBuilder extends Builder<Animal> {
       double yMax = yRange.getDouble(1);
 
       // Generar posición aleatoria dentro del rango
-      double x = xMin + Math.random() * (xMax - xMin);
-      double y = yMin + Math.random() * (yMax - yMin);
+      double x = xMin + Utils.RAND.nextDouble() * (xMax - xMin);
+      double y = yMin + Utils.RAND.nextDouble() * (yMax - yMin);
 
       position = new Vector2D(x, y);
     }
@@ -84,12 +61,12 @@ public class SheepBuilder extends Builder<Animal> {
       dangerStrategy = strategyFactory.createInstance(defaultDanger);
     }
 
-      return new Sheep(mateStrategy,dangerStrategy,position);
+    return new Sheep(mateStrategy, dangerStrategy, position);
 
-    }
+  }
 
   @Override
-  protected  void fillInData(JSONObject o) {
+  protected void fillInData(JSONObject o) {
     o.put("pos", "posicion opcional como array de dos double [x, y]");
     o.put("mate_strategy", "estrategia de apareamiento opcional (JSONObject)");
     o.put("sel_strategy", "estrategia de peligro opcional (JSONObject)");

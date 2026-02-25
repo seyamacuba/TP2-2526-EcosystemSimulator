@@ -7,7 +7,7 @@ import simulator.misc.Vector2D;
 
 import java.util.List;
 
-public abstract class Animal implements Entity,AnimalInfo {
+public abstract class Animal implements Entity, AnimalInfo {
 
   final static double INIT_ENERGY = 100.0;
   final static double MUTATION_TOLERANCE = 0.2;
@@ -32,20 +32,20 @@ public abstract class Animal implements Entity,AnimalInfo {
   private AnimalMapView regionMngr;
   private SelectionStrategy mateStrategy;
 
-  protected Animal(String geneticCode, Diet diet, double sightRange, double initSpeed, SelectionStrategy mateStrategy, Vector2D pos){
-    if(geneticCode == null || geneticCode.isEmpty()){
+  protected Animal(String geneticCode, Diet diet, double sightRange, double initSpeed, SelectionStrategy mateStrategy, Vector2D pos) {
+    if (geneticCode == null || geneticCode.isEmpty()) {
       throw new IllegalArgumentException("Genetic Code cannot be empty");
     }
-    if(diet == null){
+    if (diet == null) {
       throw new IllegalArgumentException("Diet cannot be null");
     }
-    if(sightRange <= 0){
+    if (sightRange <= 0) {
       throw new IllegalArgumentException("Sight Range must be positive");
     }
-    if(initSpeed <= 0){
+    if (initSpeed <= 0) {
       throw new IllegalArgumentException("Initial Speed must be positive");
     }
-    if(mateStrategy == null){
+    if (mateStrategy == null) {
       throw new IllegalArgumentException("Mate Strategy cannot be null");
     }
     setState(State.NORMAL);
@@ -63,9 +63,10 @@ public abstract class Animal implements Entity,AnimalInfo {
     setMateStrategy(mateStrategy);
     setPos(pos);
   }
-  protected Animal(Animal p1, Animal p2){
+
+  protected Animal(Animal p1, Animal p2) {
     setState(State.NORMAL);
-    double energy = (p1.getEnergy()+p2.getEnergy())/2;
+    double energy = (p1.getEnergy() + p2.getEnergy()) / 2;
     setEnergy(energy);
     setDesire(0.0);
     setDest(null);
@@ -75,11 +76,12 @@ public abstract class Animal implements Entity,AnimalInfo {
     setDiet(p1.getDiet());
     setGeneticCode(p1.getGeneticCode());
     setMateStrategy(p2.getMateStrategy());
-    setPos(p1.getPosition().plus(Vector2D.get_random_vector(-1,1).scale(60.0*(Utils.RAND.nextGaussian()+1))));
-    setSightRange(Utils.getRandomizedParameter((p1.getSightRange()+p2.getSightRange())/2,0.2));
-    setSpeed(Utils.getRandomizedParameter((p1.getSpeed()+p2.getSpeed())/2, 0.2));
+    setPos(p1.getPosition().plus(Vector2D.get_random_vector(-1, 1).scale(60.0 * (Utils.RAND.nextGaussian() + 1))));
+    setSightRange(Utils.getRandomizedParameter((p1.getSightRange() + p2.getSightRange()) / 2, 0.2));
+    setSpeed(Utils.getRandomizedParameter((p1.getSpeed() + p2.getSpeed()) / 2, 0.2));
     setAge(0.0);
   }
+
   @Override
   public String getGeneticCode() {
     return geneticCode;
@@ -105,7 +107,7 @@ public abstract class Animal implements Entity,AnimalInfo {
 
   protected void setState(State state) {
     this.state = state;
-    switch(this.state){
+    switch (this.state) {
       case NORMAL:
         setNormalStateAction();
         break;
@@ -121,7 +123,8 @@ public abstract class Animal implements Entity,AnimalInfo {
       case DEAD:
         setDeadStateAction();
         break;
-      default: setNormalStateAction();
+      default:
+        setNormalStateAction();
     }
   }
 
@@ -222,39 +225,40 @@ public abstract class Animal implements Entity,AnimalInfo {
   public Vector2D getPosition() {
     return pos;
   }
+
   @Override
   public Vector2D getDestination() {
     return dest;
   }
+
   @Override
   public boolean isPregnant() {
     return baby != null;
   }
 
 
-
   //MÉTODOS:
-  private Vector2D adjustPos(Vector2D pos, int width, int height){  //metodo de Ajustar Posiciones
+  protected Vector2D adjustPos(Vector2D pos, int width, int height) {  //metodo de Ajustar Posiciones
     double x = pos.getX();
     double y = pos.getY();
-    while (x>= width) x -= width;
+    while (x >= width) x -= width;
     while (x < 0) x += width;
-    while (y>= height) y -= height;
+    while (y >= height) y -= height;
     while (y < 0) y += height;
 
-    return new Vector2D(x,y);
+    return new Vector2D(x, y);
   }
 
-  public void init(AnimalMapView regMngr){ //Override del gestor
+  public void init(AnimalMapView regMngr) { //Override del gestor
     setRegionMngr(regMngr);
     int width = regionMngr.getWidth();
     int height = regionMngr.getHeight();
     //si pos es null, pos aleatoria
-    if(this.pos == null){
+    if (this.pos == null) {
       double x = Utils.RAND.nextDouble() * (width - 1);
       double y = Utils.RAND.nextDouble() * (height - 1);
       this.pos = new Vector2D(x, y);
-    }else { //si pos no es null, ajustar dentro del mapa si necesario
+    } else { //si pos no es null, ajustar dentro del mapa si necesario
       this.pos = adjustPos(this.pos, width, height);
     }
     //elige pos aleatoria para dest
@@ -263,7 +267,7 @@ public abstract class Animal implements Entity,AnimalInfo {
     this.dest = new Vector2D(dx, dy);
   }
 
-  public Animal deliverBaby(){
+  public Animal deliverBaby() {
     Animal b = baby;
     baby = null;
     return b;
@@ -274,9 +278,11 @@ public abstract class Animal implements Entity,AnimalInfo {
     setEnergy(Math.max(0.0, Math.min(MAX_ENERGY, getEnergy() - energyLoss)));
     setDesire(Math.max(0.0, Math.min(MAX_DESIRE, getDesire() + desireChange)));
   }
+
   protected double calculateSpeed(double baseSpeed, double boost) {
     return baseSpeed * boost * Math.exp((getEnergy() - MAX_ENERGY) * HUNGER_DECAY_EXP_FACTOR);
   }
+
   protected Animal findTarget(SelectionStrategy strategy, String geneticCode) {
     List<Animal> candidates = getRegionMngr().getAnimalsInRange(this,
       a -> a.getGeneticCode().equals(geneticCode));
@@ -288,7 +294,8 @@ public abstract class Animal implements Entity,AnimalInfo {
       a -> a.getDiet() == diet);
     return strategy.select(this, candidates);
   }
-  protected void move(double speed){
+
+  protected void move(double speed) {
     pos = pos.plus(dest.minus(pos).direction().scale(speed));
   }
 
@@ -312,11 +319,17 @@ public abstract class Animal implements Entity,AnimalInfo {
     obj.put("state", state.toString());
     return obj;
   }
+
   // MÉTODOS QUE NECESITAN IMPLEMENTAR LAS SUBCLASES:
   public abstract void update(double dt);
+
   protected abstract void setNormalStateAction();
+
   protected abstract void setHungerStateAction();
+
   protected abstract void setDeadStateAction();
+
   protected abstract void setDangerStateAction();
+
   protected abstract void setMateStateAction();
 }

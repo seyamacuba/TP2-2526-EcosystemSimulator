@@ -1,62 +1,26 @@
 package simulator.launcher;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import simulator.control.Controller;
-import simulator.factories.Builder;
-import simulator.factories.BuilderBasedFactory;
-import simulator.factories.DefaultRegionBuilder;
-import simulator.factories.DynamicSupplyRegionBuilder;
-import simulator.factories.Factory;
-import simulator.factories.SelectClosestBuilder;
-import simulator.factories.SelectFirstBuilder;
-import simulator.factories.SelectYoungestBuilder;
-import simulator.factories.SheepBuilder;
-import simulator.factories.WolfBuilder;
+import simulator.factories.*;
 import simulator.misc.Utils;
 import simulator.model.Animal;
 import simulator.model.Region;
 import simulator.model.SelectionStrategy;
 import simulator.model.Simulator;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
-
-  private enum ExecMode {
-    BATCH("batch", "Batch mode"), GUI("gui", "Graphical User Interface mode");
-
-    private String tag;
-    private String desc;
-
-    private ExecMode(String modeTag, String modeDesc) {
-      tag = modeTag;
-      desc = modeDesc;
-    }
-
-    public String getTag() {
-      return tag;
-    }
-
-    public String getDesc() {
-      return desc;
-    }
-  }
 
   // default values for some parameters
   //
   private final static Double DEFAULT_TIME = 10.0; // in seconds
   private final static Double DEFAULT_DELTA_TIME = 0.03; // in seconds
-
   // some attributes to stores values corresponding to command-line parameters
   //
   private static Double time = null;
@@ -64,13 +28,11 @@ public class Main {
   private static String inFile = null;
   private static String outFile = null;
   private static boolean simpleViewer = false;
-  private static ExecMode mode = ExecMode.BATCH;
-
+  private static final ExecMode mode = ExecMode.BATCH;
   // Factorías
   private static Factory<SelectionStrategy> selectionStrategyFactory;
   private static Factory<Region> regionsFactory;
   private static Factory<Animal> animalsFactory;
-
 
   private static void parseArgs(String[] args) {
 
@@ -148,6 +110,7 @@ public class Main {
       throw new ParseException("In batch mode an input configuration file is required");
     }
   }
+
   private static void parseOutFileOption(CommandLine line) throws ParseException {
     outFile = line.getOptionValue("o");
     if (mode == ExecMode.BATCH && outFile == null) {
@@ -165,6 +128,7 @@ public class Main {
       throw new ParseException("Invalid value for time: " + t);
     }
   }
+
   private static void parseDeltaTimeOption(CommandLine line) throws ParseException {
     String dt = line.getOptionValue("dt", DEFAULT_DELTA_TIME.toString());
     try {
@@ -203,7 +167,6 @@ public class Main {
   private static JSONObject loadJSONFile(InputStream in) {
     return new JSONObject(new JSONTokener(in));
   }
-
 
   private static void start_batch_mode() throws Exception {
     // 1. Cargar archivo de entrada
@@ -262,13 +225,33 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    Utils.RAND.setSeed(2147483647l);
+    Utils.RAND.setSeed(2147483647L);
     try {
       start(args);
     } catch (Exception e) {
       System.err.println("Something went wrong ...");
       System.err.println();
       e.printStackTrace();
+    }
+  }
+
+  private enum ExecMode {
+    BATCH("batch", "Batch mode"), GUI("gui", "Graphical User Interface mode");
+
+    private final String tag;
+    private final String desc;
+
+    ExecMode(String modeTag, String modeDesc) {
+      tag = modeTag;
+      desc = modeDesc;
+    }
+
+    public String getTag() {
+      return tag;
+    }
+
+    public String getDesc() {
+      return desc;
     }
   }
 }

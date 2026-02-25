@@ -1,7 +1,6 @@
 package simulator.factories;
 
 import org.json.JSONObject;
-import simulator.factories.Builder;
 import simulator.model.DynamicSupplyRegion;
 import simulator.model.Region;
 
@@ -13,28 +12,28 @@ public class DynamicSupplyRegionBuilder extends Builder<Region> {
 
   @Override
   protected Region createInstance(JSONObject data) {
-    try{
-      if(!data.has("factor")){
-        throw new IllegalArgumentException("El factor es obligatorio");
-      }
-      double factor = data.getDouble("factor");
-
-      if(!data.has("food")){
-        throw new IllegalArgumentException("El JSON debe de contener food.");
-      }
-      double food = data.getDouble("food");
-
-      if(factor <= 0){
-        throw new IllegalArgumentException("El factor debe de ser mayor que 0");
-      }
-      if(food < 0){
-        throw new IllegalArgumentException("La comida debe de ser mayor o igual que 0");
-      }
-
-      return new DynamicSupplyRegion(food, factor);
-    }catch (Exception e){
-      throw new IllegalArgumentException("Error creando el objeto");
+    // extraer food, es opcional, si no hay, por defecto 1000.0
+    double food;
+    if (data.has("food")) {
+      food = data.getDouble("food");
+    } else {
+      food = 1000.0;
     }
+    //extraer factor, es opcional, si no hay es 2.0
+    double factor;
+    if (data.has("factor")) {
+      factor = data.getDouble("factor");
+    } else {
+      factor = 2.0;
+    }
+
+    if (factor < 0) {
+      throw new IllegalArgumentException("El factor de crecimiento no puede ser negativo");
+    }
+    if (food <= 0) {
+      throw new IllegalArgumentException("La comida inicial debe ser un valor positivo");
+    }
+    return new DynamicSupplyRegion(food, factor);
   }
 
   @Override
