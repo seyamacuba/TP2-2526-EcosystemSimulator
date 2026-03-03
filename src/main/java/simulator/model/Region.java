@@ -54,5 +54,10 @@ public abstract class Region implements Entity, FoodSupplier, RegionInfo {
       return 60.0 * Math.exp(-Math.max(0, n - 5.0) * 2.0) * dt;
     }
   }
+
+  public List<AnimalInfo> getAnimalsInfo() {
+    return new ArrayList<>(animales); // se puede usar Collections.unmodifiableList(animals);
+  }
+  //Explicar porque hacer "return animals" no funciona.
 }
 

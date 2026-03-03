@@ -13,8 +13,8 @@ public class Simulator implements JSONable {
 
   private final Factory<Animal> animalsFactory;
   private final Factory<Region> regionsFactory;
-  private final RegionManager regionMngr;
-  private final List<Animal> animals;
+  private RegionManager regionMngr;
+  private List<Animal> animals;
   private double time;
 
   public Simulator(int cols, int rows, int width, int height,
@@ -135,4 +135,14 @@ public class Simulator implements JSONable {
   //   "time": t,
   //   "state": s
   //  }
+
+  public void reset(int cols, int rows, int width, int height){
+    if(this.animals.isEmpty()){
+      this.animals = new ArrayList<>(); //Si no hay, crea una lista de animales.
+    }else{
+      this.animals.clear(); //Si no limpia.
+    }
+    this.time = 0.0;
+    this.regionMngr = new RegionManager(cols, rows, width, height);
+  }
 }

@@ -4,10 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.misc.Vector2D;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class RegionManager implements AnimalMapView {
@@ -210,4 +207,8 @@ public class RegionManager implements AnimalMapView {
     //donde r es lo que devuelve asJSON() de la región en la fila i y columna j.
   }
   //
+  @Override
+  public Iterator<RegionData> iterator(){
+
+  }
 }

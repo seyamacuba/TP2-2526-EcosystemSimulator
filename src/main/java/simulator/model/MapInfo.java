@@ -1,6 +1,6 @@
 package simulator.model;
 
-public interface MapInfo extends JSONable {
+public interface MapInfo extends JSONable, Iterable<MapInfo.RegionData>{
   int getCols();
 
   int getRows();
@@ -12,4 +12,7 @@ public interface MapInfo extends JSONable {
   int getRegionWidth();
 
   int getRegionHeight();
+
+  public record RegionData(int row, int col, RegionInfo r) {
+  }
 }
