@@ -114,7 +114,7 @@ public class Main {
   private static void parseOutFileOption(CommandLine line) throws ParseException {
     outFile = line.getOptionValue("o");
     if (mode == ExecMode.BATCH && outFile == null) {
-      // En modo batch, requerimos outFile para escribir el JSON (a no ser que quieras usar System.out)
+      // En modo batch, necesitamos outFile para escribir el JSON (a no ser que quieras usar System.out)
       // throw new ParseException("In batch mode an output configuration file is required");
     }
   }
@@ -157,7 +157,7 @@ public class Main {
     regionBuilders.add(new DynamicSupplyRegionBuilder());
     regionsFactory = new BuilderBasedFactory<>(regionBuilders);
 
-    // 3) Initialize the animals factory (requieren la de estrategias)
+    // 3) Initialize the animals factory (necesitan la de estrategias)
     List<Builder<Animal>> animalBuilders = new ArrayList<>();
     animalBuilders.add(new SheepBuilder(selectionStrategyFactory));
     animalBuilders.add(new WolfBuilder(selectionStrategyFactory));
@@ -179,10 +179,10 @@ public class Main {
     if (outFile != null) {
       os = new FileOutputStream(new File(outFile));
     } else {
-      os = System.out; // Por si no especifican -o, lo tiramos por consola
+      os = System.out; // Si no se especifica -o lo tiramos por consola
     }
 
-    // 3. Obtener dimensiones del JSON para el Simulator (según formato de ex1.json)
+    // 3. Obtener dimensiones del JSON para el Simulator
     int cols = inputData.getInt("cols");
     int rows = inputData.getInt("rows");
     int width = inputData.getInt("width");
