@@ -11,5 +11,9 @@ public class DefaultRegion extends Region {
   public double getFood(AnimalInfo a, double dt) {
     return calculateFood(a, dt);
   }
+  public String toString() {
+    return "DefaultRegion";
+  }
 }
+
 

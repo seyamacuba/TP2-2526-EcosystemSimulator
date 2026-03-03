@@ -30,4 +30,7 @@ public class DynamicSupplyRegion extends Region {
       food += growthFactor * dt;
     }
   }
+  public String toString(){
+    return "DynamicSupplyRegion";
+  }
 }
