@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Simulator implements JSONable {
+public class Simulator implements JSONable, Observable<EcoSysObserver> {
   //Esta clase tiene que recibir como atributos una factoría de animales y otra de regiones (ver el apartado Las Factorías).
   // Además tiene que llevar un gestor de regiones, una lista con todos los animales que están participando en la simulación, y el tiempo actual (double).
 
@@ -16,6 +16,8 @@ public class Simulator implements JSONable {
   private RegionManager regionMngr;
   private List<Animal> animals;
   private double time;
+
+  private List<EcoSysObserver> observers;
 
   public Simulator(int cols, int rows, int width, int height,
                    Factory<Animal> animalsFactory, Factory<Region> regionsFactory) {
@@ -30,6 +32,7 @@ public class Simulator implements JSONable {
     this.regionMngr = new RegionManager(cols, rows, width, height);
     this.animals = new ArrayList<>();
     this.time = 0.0;
+    this.observers = new ArrayList<>();
   }
 
   //regions
@@ -38,6 +41,10 @@ public class Simulator implements JSONable {
       throw new IllegalArgumentException("Null region");
     }
     regionMngr.setRegion(row, col, r);
+
+    for (EcoSysObserver o : observers) {
+      o.onRegionSet(row, col, regionMngr, r);
+    }
   }
 
   public void setRegion(int row, int col, JSONObject rJson) {
@@ -55,6 +62,11 @@ public class Simulator implements JSONable {
     }
     animals.add(a);
     regionMngr.registerAnimal(a);
+
+    List<AnimalInfo> animals = new ArrayList<>(this.animals); //creo copia
+    for (EcoSysObserver o : observers) {
+      o.onAnimalAdded(time, regionMngr, animals, a); //aviso a los observers
+    }
   }
 
   public void addAnimal(JSONObject aJson) {
@@ -116,6 +128,12 @@ public class Simulator implements JSONable {
     for (Animal baby : littlebabies) {
       addAnimal(baby);
     }
+
+    List<AnimalInfo> animals = new ArrayList<>(this.animals);//copia
+    for(EcoSysObserver o : observers) {
+      o.onAdvance(time, regionMngr, animals, dt);
+    }
+
   }
 
   public JSONObject asJSON() {
@@ -137,6 +155,9 @@ public class Simulator implements JSONable {
   //  }
 
   public void reset(int cols, int rows, int width, int height){
+    if (cols<=0 || rows<=0 || width<=0 || height<=0) {
+      throw new IllegalArgumentException("Invalid map dimensions");
+    }
     if(this.animals.isEmpty()){
       this.animals = new ArrayList<>(); //Si no hay, crea una lista de animales.
     }else{
@@ -144,5 +165,26 @@ public class Simulator implements JSONable {
     }
     this.time = 0.0;
     this.regionMngr = new RegionManager(cols, rows, width, height);
+
+    List<AnimalInfo> animals = new ArrayList<>(this.animals); //copia para enviar
+    for(EcoSysObserver o : observers){
+      o.onReset(time, regionMngr, animals); //aviso a cada observer
+    }
+  }
+
+  @Override
+  public void addObserver(EcoSysObserver o){
+    if(o == null){
+      throw new IllegalArgumentException("Null observer");
+    }
+    if(!observers.contains(o)){ //si no esta en la lista ya, no dupes
+      observers.add(o);
+    }
+    List<AnimalInfo> animals = new ArrayList<>(this.animals); //enviamos copia, no quiero que me lo toquen
+    o.onRegister(time, regionMngr, animals); //envio noti cuando alguien addObserver
+  }
+  @Override
+  public void removeObserver(EcoSysObserver o){
+    observers.remove(o); //si esta en la lista lo mata
   }
 }

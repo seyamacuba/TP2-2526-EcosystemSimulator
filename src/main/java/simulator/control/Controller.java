@@ -3,6 +3,7 @@ package simulator.control;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import simulator.model.AnimalInfo;
+import simulator.model.EcoSysObserver;
 import simulator.model.MapInfo;
 import simulator.model.Simulator;
 import simulator.view.SimpleObjectViewer;
@@ -113,4 +114,59 @@ public class Controller {
     result.put("out", finalState);
     p.println(result.toString());
   }
+
+  //la GUI no toca el simulador directamente, pero si controller
+  public void reset(int cols,  int rows, int width, int height) {
+    sim.reset(cols, rows, width, height);
+  }
+
+  public void advance(double dt) {
+    sim.advance(dt);
+  }
+
+  public void addObserver(EcoSysObserver o) {
+    sim.addObserver(o);
+  }
+
+  public void removeObserver(EcoSysObserver o) {
+    sim.removeObserver(o);
+  }
+
+  public void setRegions(JSONObject rs) { //como addData
+    if (rs == null) {
+      throw new IllegalArgumentException("Null regions");
+    }
+    if (rs.has("regions")) {
+      JSONArray regions = rs.getJSONArray("regions");
+
+      for (int i = 0; i < regions.length(); i++) {
+        JSONObject entry = regions.getJSONObject(i);
+
+        JSONArray rowRange = entry.getJSONArray("row");
+        JSONArray colRange = entry.getJSONArray("col");
+        JSONObject spec = entry.getJSONObject("spec");
+
+        int rowFrom = rowRange.getInt(0);
+        int rowTo = rowRange.getInt(1);
+        int colFrom = colRange.getInt(0);
+        int colTo = colRange.getInt(1);
+
+        for (int r = rowFrom; r <= rowTo; r++) {
+          for (int c = colFrom; c <= colTo; c++) {
+            sim.setRegion(r, c, spec);
+          }
+        }
+      }
+    }
+  }
+  //Estructura
+  //{
+  // "regions":[
+  //   {
+  //     "row":[0,6],
+  //     "col":[0,3],
+  //     "spec":{...}
+  //   }
+  // ]
+  //}
 }

@@ -24,15 +24,15 @@ public class Main {
   // some attributes to stores values corresponding to command-line parameters
   //
   private static Double time = null;
-  private static Double deltaTime = DEFAULT_DELTA_TIME;
+  public static Double deltaTime = DEFAULT_DELTA_TIME;
   private static String inFile = null;
   private static String outFile = null;
   private static boolean simpleViewer = false;
   private static final ExecMode mode = ExecMode.BATCH;
   // Factorías
-  private static Factory<SelectionStrategy> selectionStrategyFactory;
-  private static Factory<Region> regionsFactory;
-  private static Factory<Animal> animalsFactory;
+  public static Factory<SelectionStrategy> selectionStrategyFactory;
+  public static Factory<Region> regionsFactory;
+  public static Factory<Animal> animalsFactory;
 
   private static void parseArgs(String[] args) {
 
