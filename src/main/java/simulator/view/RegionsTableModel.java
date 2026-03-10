@@ -7,27 +7,45 @@ import simulator.model.MapInfo;
 import simulator.model.RegionInfo;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //bueno es como la otra, falta poner logica
 class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
 
   private Controller ctrl;
+  private Map<String, int[]> regions;
 
   RegionsTableModel(Controller ctrl) {
     this.ctrl = ctrl;
     ctrl.addObserver(this);
+    regions = new HashMap<>();
   }
 
   @Override
   public int getRowCount() {
-    return 0;
+    return regions.size();
   }
 
   @Override
   public int getColumnCount() {
-    return 0;
+    return 5;
   }
+
+  @Override
+  public String getColumnName(int col) {
+    switch(col){
+      case 0: return "Row";
+      case 1: return "Col";
+      case 2: return "Desc.";
+      case 3: return "HUNGER";
+      case 4: return "DANGER";
+      case 5: return "DEAD";
+      default: return " ";
+    }
+  }
+
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
@@ -58,5 +76,4 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
   public void onAdvance(double time, MapInfo map, List<AnimalInfo> animals, double dt) {
 
   }
-  // TODO el resto de métodos van aquí…
 }
