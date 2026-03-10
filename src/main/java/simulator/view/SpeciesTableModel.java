@@ -8,33 +8,54 @@ import simulator.model.MapInfo;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 //La tabla animalets y cosas. Tengo que hacer la logica
 class SpeciesTableModel extends AbstractTableModel implements EcoSysObserver {
 
   private Controller ctrl;
   //tengo que crear una estructura para mis bichos
+  private Map<String, int[]> species;
 
   SpeciesTableModel(Controller ctrl) {
     this.ctrl = ctrl;
     ctrl.addObserver(this);
-    //bichitos
+    species = new HashMap<>();
   }
 
   @Override
   public int getRowCount() {
-    return 0;
-    //tamano de la estructura de bichitos
+    return species.size();
   }
 
   @Override
   public int getColumnCount() {
-    return 0;
+    return 6;
   }
 
   @Override
   public String getColumnName(int col) {
-    return"";
+    switch(col){
+      case 0: return "Species";
+      case 1: return "NORMAL";
+      case 2: return "MATE";
+      case 3: return "CARNIVORE";
+      case 4: return "HERBIVORE";
+      default: return " ";
+    }
+  }
+
+  public void UpdateTable(List<AnimalInfo> animals) {
+    species.clear();
+    for (AnimalInfo a : animals) {
+      String especie = a.getGeneticCode();
+      int state = a.getState().ordinal();
+      if(!species.containsKey(especie)){
+        species.put(especie, new int[5]);
+      }
+      species.get(especie)[state]++;
+    }
+    fireTableDataChanged(); //cambió la tablitaaa
   }
 
   @Override
