@@ -11,7 +11,6 @@ import java.util.List;
 
 class StatusBar extends JPanel implements EcoSysObserver {
 //Su trabajo es solo pintar las cosas en el monitor.
-  // TODO Añadir los atributos necesarios.
   private JLabel dimensionesLabel;
   private JLabel timeLabel;
   private JLabel animalesLabel;
@@ -29,7 +28,7 @@ class StatusBar extends JPanel implements EcoSysObserver {
     //      dimensión y añadirlos al panel. Puedes utilizar el siguiente código
     //      para añadir un separador vertical:
     this.timeLabel = new JLabel("Time: 0.000");
-    this.animalesLabel = new JLabel("Total Animamls: 0");
+    this.animalesLabel = new JLabel("Total Animals: 0");
     this.dimensionesLabel = new JLabel("Dimension: 0x0 0x0");
 
     this.add(this.timeLabel);
@@ -48,16 +47,24 @@ class StatusBar extends JPanel implements EcoSysObserver {
   }
 
   private void updateInfo(double time, MapInfo map, List<AnimalInfo> animals){
-
+    this.timeLabel.setText("Time: " + String.format("%.3f", time));
+    this.animalesLabel.setText("Total Animals: " + animals.size());
+    this.dimensionesLabel.setText("Dimension: " + map.getWidth() + "x" + map.getHeight());
   }
 
-  public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {}
+  public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {
+    updateInfo(time, map, animals);
+  }
 
-  public void onReset(double time, MapInfo map, List<AnimalInfo> animals) {}
+  public void onReset(double time, MapInfo map, List<AnimalInfo> animals) {
+    updateInfo(time, map, animals);
+  }
 
   public void onAnimalAdded(double time, MapInfo map, List<AnimalInfo> animals, AnimalInfo a) {}
 
   public void onRegionSet(int row, int col, MapInfo map, simulator.model.RegionInfo r) {}
 
-  public void onAdvance(double time, MapInfo map, List<AnimalInfo> animals, double dt) {}
+  public void onAdvance(double time, MapInfo map, List<AnimalInfo> animals, double dt) {
+    updateInfo(time, map, animals);
+  }
 }

@@ -179,9 +179,10 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
     }
     if(!observers.contains(o)){ //si no esta en la lista ya, no dupes
       observers.add(o);
+      //Lo he añadido dentro del if porque entiendo que solo tiene que notificar si es añadido
+      List<AnimalInfo> animals = new ArrayList<>(this.animals); //enviamos copia, no quiero que me lo toquen
+      o.onRegister(time, regionMngr, animals); //envio noti cuando alguien addObserver
     }
-    List<AnimalInfo> animals = new ArrayList<>(this.animals); //enviamos copia, no quiero que me lo toquen
-    o.onRegister(time, regionMngr, animals); //envio noti cuando alguien addObserver
   }
   @Override
   public void removeObserver(EcoSysObserver o){

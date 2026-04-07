@@ -10,10 +10,12 @@ import simulator.model.Animal;
 import simulator.model.Region;
 import simulator.model.SelectionStrategy;
 import simulator.model.Simulator;
+import simulator.view.MainWindow;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.SwingUtilities;
 
 public class Main {
 
@@ -28,7 +30,7 @@ public class Main {
   private static String inFile = null;
   private static String outFile = null;
   private static boolean simpleViewer = false;
-  private static final ExecMode mode = ExecMode.BATCH;
+  private static ExecMode mode = ExecMode.BATCH;
   // Factorías
   public static Factory<SelectionStrategy> selectionStrategyFactory;
   public static Factory<Region> regionsFactory;
@@ -46,6 +48,7 @@ public class Main {
     try {
       CommandLine line = parser.parse(cmdLineOptions, args);
       parseHelpOption(line, cmdLineOptions);
+      parseModeOption(line);
       parseInFileOption(line);
       parseOutFileOption(line);
       parseTimeOption(line);
@@ -92,7 +95,9 @@ public class Main {
       .build());
     // simple viewer
     cmdLineOptions.addOption(Option.builder("sv").longOpt("simple-viewer").desc("Show the viewer window in console mode.").build());
-
+   //GUI
+    cmdLineOptions.addOption(Option.builder("m").longOpt("mode").hasArg()
+      .desc("Execution mode. Possible values: 'batch' (default), 'gui'.").build());
     return cmdLineOptions;
   }
 
@@ -141,6 +146,17 @@ public class Main {
 
   private static void parseSimpleViewerOption(CommandLine line) {
     simpleViewer = line.hasOption("sv");
+  }
+
+  private static void parseModeOption(CommandLine line) throws ParseException {
+    String modeStr = line.getOptionValue("m", ExecMode.BATCH.getTag());
+    for (ExecMode m : ExecMode.values()) {
+      if (m.getTag().equals(modeStr)) {
+        mode = m;
+        return;
+      }
+    }
+    throw new ParseException("Invalid mode: " + modeStr);
   }
 
   private static void initFactories() {
@@ -208,7 +224,32 @@ public class Main {
   }
 
   private static void start_GUI_mode() throws Exception {
-    throw new UnsupportedOperationException("GUI mode is not ready yet ...");
+    // inFile es opcional en GUI
+    JSONObject inputData = null;
+    if (inFile != null) {
+      InputStream is = new FileInputStream(new File(inFile));
+      inputData = loadJSONFile(is);
+      is.close();
+    }
+
+    // Dimensiones por defecto si no hay fichero
+    int cols   = inputData != null ? inputData.getInt("cols")   : 20;
+    int rows   = inputData != null ? inputData.getInt("rows")   : 15;
+    int width  = inputData != null ? inputData.getInt("width")  : 800;
+    int height = inputData != null ? inputData.getInt("height") : 600;
+
+    Simulator sim = new Simulator(cols, rows, width, height, animalsFactory, regionsFactory);
+    Controller ctrl = new Controller(sim);
+
+    SwingUtilities.invokeAndWait(() -> new MainWindow(ctrl));
+
+    if (inputData != null) {
+      ctrl.loadData(inputData);
+    }
+
+    // Arrancar la GUI en el hilo de Swing
+    final JSONObject data = inputData;
+
   }
 
   private static void start(String[] args) throws Exception {
