@@ -6,6 +6,7 @@ import simulator.model.EcoSysObserver;
 import simulator.model.MapInfo;
 import simulator.model.State;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.ArrayList;
@@ -70,11 +71,12 @@ class SpeciesTableModel extends AbstractTableModel implements EcoSysObserver {
   }
 
   public void updateTable(List<AnimalInfo> animals) {
-    rows.clear();
+
     //Recorremos los animales y los agrupamos por codigo
     //Usamos una lista auxiliar de nombres para mantener el orden de insercion
     List<String> codes = new ArrayList<>();
     List<int[]> counts = new ArrayList<>();
+    List<Object[]> rows = new ArrayList<>();
 
     for (AnimalInfo a : animals) {
       String code = a.getGeneticCode();
@@ -100,7 +102,11 @@ class SpeciesTableModel extends AbstractTableModel implements EcoSysObserver {
       }
       rows.add(row);
     }
-    fireTableDataChanged(); //cambió la tablitaaa
+
+    SwingUtilities.invokeLater(() -> {
+      this.rows = rows;
+      fireTableDataChanged();
+    });//cambió la tablitaaa
   }
 
   //amo el intelliJ
