@@ -1,6 +1,5 @@
 package simulator.view;
 
-import simulator.model.Animal;
 import simulator.model.AnimalInfo;
 import simulator.model.MapInfo;
 import simulator.model.State;
@@ -17,173 +16,148 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/*
- * An incomplete version of  the map viewer, to be completed by students.
- */
-
 @SuppressWarnings("serial")
 public class MapViewer extends AbstractMapViewer {
 
-	// Anchura/altura de la simulación -- se supone que siempre van a ser
-	// iguales al tamaño del componente
-	//
-	// Width/height of the simulation -- they will always be equal to the size
-	// of the component
-	//
-	private int width;
-	private int height;
+  // Anchura/altura de una región
+  //
+  // Width/height of a region
+  //
+  int rWidth;
+  int rHeight;
+  // Mostramos sólo animales con este estado. Los posibles valores de currState
+  // son null, y los valores de Animal.State.values(). Si es null mostramos tot.
+  //
+  // We show the animals that have this state. The possible values of currentState
+  // are: null and the values returned by Animal.State.values(). If it is null we
+  // show all animals.
+  //
+  State currentState;
+  // Un mapa para la información sobre las especies.
+  //
+  // A map with the information for each species.
+  //
+  Map<String, SpeciesInfo> kindsInfo = new HashMap<>();
+  // Anchura/altura de la simulación -- se supone que siempre van a ser
+  // iguales al tamaño del componente
+  //
+  // Width/height of the simulation -- they will always be equal to the size
+  // of the component
+  //
+  private int width;
+  private int height;
+  // Número de filas/columnas de la simulación (regiones)
+  //
+  // Number of rows/cols of the simulation (regions)
+  //
+  private int rows;
+  private int cols;
+  // En estos atributos guardamos la lista de animales y el tiempo que hemos
+  // recibido la última vez para dibujarlos.
+  //
+  // The value of these attributes are the list of animals and the time that we
+  // have received in the notification (those will be shown).
+  //
+  volatile private Collection<AnimalInfo> objs;
+  volatile private Double time;
+  // El font que usamos para dibujar texto.
+  //
+  // The font to be used for drawing text.
+  //
+  private final Font textFont = new Font("Arial", Font.BOLD, 12);
+  // Indica si mostramos el texto la ayuda o no.
+  //
+  // Indicates if the 'help' information is visible or hidden.
+  //
+  private boolean showHelp;
 
-	// Número de filas/columnas de la simulación (regiones)
-	//
-	// Number of rows/cols of the simulation (regions)
-	//
-	private int rows;
-	private int cols;
+  public MapViewer() {
+    initGUI();
+  }
 
-	// Anchura/altura de una región
-	//
-	// Width/height of a region
-	//
-	int rWidth;
-	int rHeight;
+  private void initGUI() {
 
-	// Mostramos sólo animales con este estado. Los posibles valores de currState
-	// son null, y los valores de Animal.State.values(). Si es null mostramos todo.
-	//
-	// We show the animals that have this state. The possible values of currentState
-	// are: null and the values returned by Animal.State.values(). If it is null we
-	// show all animals.
-	//
-	State currentState;
+    addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        switch (e.getKeyChar()) {
+          case 'h':
+            showHelp = !showHelp;
+            repaint();
+            break;
+          case 's':
+            // Cambio circular: null → states[0] → states[1] → ... → null
+            State[] states = State.values();
+            if (currentState == null) {
+              currentState = states[0];
+            } else {
+              int idx = currentState.ordinal();
+              currentState = (idx + 1 < states.length) ? states[idx + 1] : null;
+            }
+            //      Change currState to the next option (in a circular way). After null
+            //      comes the first element of Animal.State.values(), and after the last of
+            //      these values comes null.
+            //
+            repaint();
+          default:
+        }
+      }
 
-	// En estos atributos guardamos la lista de animales y el tiempo que hemos
-	// recibido la última vez para dibujarlos.
-	//
-	// The value of these attributes are the list of animals and the time that we
-	// have received in the notification (those will be shown).
-	//
-	volatile private Collection<AnimalInfo> objs;
-	volatile private Double time;
+    });
 
-	// Una clase auxiliar para almacenar información sobre una especie.
-	//
-	// An auxiliary class to store information about species.
-	//
-	private static class SpeciesInfo {
-		private Integer count;
-		private Color color;
+    addMouseListener(new MouseAdapter() {
 
-		SpeciesInfo(Color color) {
-			count = 0;
-			this.color = color;
-		}
-	}
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        // Esto es necesario para capturar las teclas cuando el ratón está sobre este
+        // componente.
+        //
+        // This is needed to capture keystroke when the mouse is over this component.
+        //
+        requestFocus();
+      }
+    });
 
-	// Un mapa para la información sobre las especies.
-	//
-	// A map with the information for each species.
-	//
-	Map<String, SpeciesInfo> kindsInfo = new HashMap<>();
+    // Por defecto mostramos todos los animales.
+    //
+    // By default, we show all animals.
+    //
+    currentState = null;
 
-	// El font que usamos para dibujar texto.
-	//
-	// The font to be used for drawing text.
-	//
-	private Font textFont = new Font("Arial", Font.BOLD, 12);
+    // Por defecto mostramos el texto de ayuda.
+    //
+    // By default, the 'help' message is visible.
+    //
+    showHelp = true;
+  }
 
-	// Indica si mostramos el texto la ayuda o no.
-	//
-	// Indicates if the 'help' information is visible or hidden.
-	//
-	private boolean showHelp;
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
 
-	public MapViewer() {
-		initGUI();
-	}
+    Graphics2D gr = (Graphics2D) g;
+    gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    gr.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-	private void initGUI() {
+    // Cambiar el font para dibujar texto.
+    //
+    // Change the font to be used when drawing text.
+    //
+    g.setFont(textFont);
 
-		addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				switch (e.getKeyChar()) {
-				case 'h':
-					showHelp = !showHelp;
-					repaint();
-					break;
-				case 's':
-          // Cambio circular: null → states[0] → states[1] → ... → null
-          State[] states = State.values();
-          if (currentState == null) {
-            currentState = states[0];
-          } else {
-            int idx = currentState.ordinal();
-            currentState = (idx + 1 < states.length) ? states[idx + 1] : null;
-          }
-					//      Change currState to the next option (in a circular way). After null
-					//      comes the first element of Animal.State.values(), and after the last of
-					//      these values comes null.
-					//
-					repaint();
-				default:
-				}
-			}
+    // Dibujar fondo blanco.
+    //
+    // Draw a white background.
+    //
+    gr.setBackground(Color.WHITE);
+    gr.clearRect(0, 0, width, height);
 
-		});
-
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// Esto es necesario para capturar las teclas cuando el ratón está sobre este
-				// componente.
-				//
-				// This is needed to capture keystroke when the mouse is over this component.
-				//
-				requestFocus();
-			}
-		});
-
-		// Por defecto mostramos todos los animales.
-		//
-		// By default, we show all animals.
-		//
-		currentState = null;
-
-		// Por defecto mostramos el texto de ayuda.
-		//
-		// By default, the 'help' message is visible.
-		//
-		showHelp = true;
-	}
-
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		Graphics2D gr = (Graphics2D) g;
-		gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		gr.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-		// Cambiar el font para dibujar texto.
-		//
-		// Change the font to be used when drawing text.
-		//
-		g.setFont(textFont);
-
-		// Dibujar fondo blanco.
-		//
-		// Draw a white background.
-		//
-		gr.setBackground(Color.WHITE);
-		gr.clearRect(0, 0, width, height);
-
-		// Dibujar los animales, el tiempo, información sobre las especies, etc.
-		//
-		// Draw the animals, the time, species information. etc.
-		//
-		if (objs != null)
-			drawObjects(gr, objs, time);
+    // Dibujar los animales, el tiempo, información sobre las especies, etc.
+    //
+    // Draw the animals, the time, species information. etc.
+    //
+    if (objs != null)
+      drawObjects(gr, objs, time);
 
     // Texto de ayuda
     if (showHelp) {
@@ -191,22 +165,22 @@ public class MapViewer extends AbstractMapViewer {
       g.drawString("h: toggle help", 5, 15);
       g.drawString("s: show animals of a specific state", 5, 30);
     }
-		//      Show a 'help' text if showHelp is true. The text should be the following
-		//      in two separated lines:
-		//
-		// h: toggle help
-		// s: show animals of a specific state
+    //      Show a 'help' text if showHelp is true. The text should be the following
+    //      in two separated lines:
+    //
+    // h: toggle help
+    // s: show animals of a specific state
 
-	}
+  }
 
-	private boolean visible(AnimalInfo a) {
-		//      return true of the animal is visible, i.e., currState is null or its
-		//      state is equal to currState.
-		//
+  private boolean visible(AnimalInfo a) {
+    //      return true of the animal is visible, i.e., currState is null or its
+    //      state is equal to currState.
+    //
     return currentState == null || a.getState() == currentState;
-	}
+  }
 
-	private void drawObjects(Graphics2D g, Collection<AnimalInfo> animals, Double time) {
+  private void drawObjects(Graphics2D g, Collection<AnimalInfo> animals, Double time) {
 
     // Grid de regiones
     g.setColor(Color.LIGHT_GRAY);
@@ -214,24 +188,24 @@ public class MapViewer extends AbstractMapViewer {
     for (int i = 0; i <= rows; i++) g.drawLine(0, i * rHeight, width, i * rHeight);
 
 
-		// Dibujar los animales.
-		//
-		// Draw the animals
-		//
-		for (AnimalInfo a : animals) {
+    // Dibujar los animales.
+    //
+    // Draw the animals
+    //
+    for (AnimalInfo a : animals) {
 
-			// Si no es visible saltamos la iteración.
-			//
-			// If the animal is not visible, we skip to the next iteration.
-			//
-			if (!visible(a))
-				continue;
+      // Si no es visible saltamos la iteración.
+      //
+      // If the animal is not visible, we skip to the next iteration.
+      //
+      if (!visible(a))
+        continue;
 
-			// La información sobre la especie de 'a'.
-			//
-			// Information of the species of 'a'
-			//
-			SpeciesInfo speciesInfo = kindsInfo.get(a.getGeneticCode());
+      // La información sobre la especie de 'a'.
+      //
+      // Information of the species of 'a'
+      //
+      SpeciesInfo speciesInfo = kindsInfo.get(a.getGeneticCode());
 
       // Si no existe la especie, la añadimos
       if (speciesInfo == null) {
@@ -268,29 +242,29 @@ public class MapViewer extends AbstractMapViewer {
       yOffset += 20;
       e.getValue().count = 0; // reset para el siguiente repaint
     }
-	}
+  }
 
-	// Un método que dibujar un texto con un rectángulo.
-	//
-	// A method for drawing a text with a rectangular border.
-	//
-	void drawStringWithRect(Graphics2D g, int x, int y, String s) {
-		Rectangle2D rect = g.getFontMetrics().getStringBounds(s, g);
-		g.drawString(s, x, y);
-		g.drawRect(x - 1, y - (int) rect.getHeight(), (int) rect.getWidth() + 1, (int) rect.getHeight() + 5);
-	}
+  // Un méto do que dibujar un texto con un rectángulo.
+  //
+  // A method for drawing a text with a rectangular border.
+  //
+  void drawStringWithRect(Graphics2D g, int x, int y, String s) {
+    Rectangle2D rect = g.getFontMetrics().getStringBounds(s, g);
+    g.drawString(s, x, y);
+    g.drawRect(x - 1, y - (int) rect.getHeight(), (int) rect.getWidth() + 1, (int) rect.getHeight() + 5);
+  }
 
-	@Override
-	public void update(List<AnimalInfo> objs, Double time) {
-		//      Store objs and time in the corresponding fields, and call repaint() to
-		//      redraw the component.
+  @Override
+  public void update(List<AnimalInfo> objs, Double time) {
+    //      Store objs and time in the corresponding fields, and call repaint() to
+    //      redraw the component.
     this.objs = objs;
     this.time = time;
     repaint();
-	}
+  }
 
-	@Override
-	public void reset(double time, MapInfo map, List<AnimalInfo> animals) {
+  @Override
+  public void reset(double time, MapInfo map, List<AnimalInfo> animals) {
     this.width = map.getWidth();
     this.height = map.getHeight();
     this.cols = map.getCols();
@@ -298,19 +272,33 @@ public class MapViewer extends AbstractMapViewer {
     this.rWidth = width / cols;
     this.rHeight = height / rows;
 
-		// Esto cambia el tamaño del componente, y así cambia el tamaño de la ventana
-		// porque en MapWindow llamamos a pack() después de llamar a reset.
-		//
-		// This line changes the size of the component, and thus the size of the window
-		// because MapWindow calls pack() after calling reset().
-		//
-		setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+    // Esto cambia el tamaño del componente, y así cambia el tamaño de la ventana
+    // porque en MapWindow llamamos a pack() después de llamar a reset.
+    //
+    // This line changes the size of the component, and thus the size of the window
+    // because MapWindow calls pack() after calling reset().
+    //
+    setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
 
-		// Dibuja el estado.
-		//
-		// Draw the state.
-		//
-		update(animals, time);
-	}
+    // Dibuja el estado.
+    //
+    // Draw the state.
+    //
+    update(animals, time);
+  }
+
+  // Una clase auxiliar para almacenar información sobre una especie.
+  //
+  // An auxiliary class to store information about species.
+  //
+  private static class SpeciesInfo {
+    private Integer count;
+    private final Color color;
+
+    SpeciesInfo(Color color) {
+      count = 0;
+      this.color = color;
+    }
+  }
 
 }

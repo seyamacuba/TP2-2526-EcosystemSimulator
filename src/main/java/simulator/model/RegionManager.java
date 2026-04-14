@@ -206,14 +206,15 @@ public class RegionManager implements AnimalMapView {
     //}
     //donde r es lo que devuelve asJSON() de la región en la fila i y columna j.
   }
+
   //
   @Override
-  public Iterator<RegionData> iterator(){
+  public Iterator<RegionData> iterator() {
     List<RegionData> regionDataList = new ArrayList<>();
 
-    for(int i = 0; i < rows; i++){
-      for(int j = 0; j < cols; j++){
-        regionDataList.add((new RegionData(i,j,regions[i][j])));
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        regionDataList.add((new RegionData(i, j, regions[i][j])));
       }
     }
     return regionDataList.iterator();

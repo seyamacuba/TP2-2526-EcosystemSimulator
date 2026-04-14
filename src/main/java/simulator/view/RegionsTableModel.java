@@ -5,10 +5,8 @@ import simulator.model.*;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
   private List<Object[]> rows;
@@ -38,7 +36,6 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
     };
   }
 
-
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
     Object[] row = rows.get(rowIndex);
@@ -49,7 +46,7 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
     List<Object[]> newRows = new ArrayList<>();
 
     // EMPIEZA EL BUCLE
-    for(MapInfo.RegionData rd : map) {
+    for (MapInfo.RegionData rd : map) {
 
       // Contar animales por dieta en esta región
       int[] counts = new int[Diet.values().length];
@@ -104,7 +101,6 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
   }
 
    */
-
 
   @Override
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {

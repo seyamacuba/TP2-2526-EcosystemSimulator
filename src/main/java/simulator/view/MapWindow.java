@@ -7,7 +7,6 @@ import simulator.model.MapInfo;
 import simulator.model.RegionInfo;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class MapWindow extends JFrame implements EcoSysObserver {

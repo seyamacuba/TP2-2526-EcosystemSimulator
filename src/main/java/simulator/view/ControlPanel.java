@@ -9,7 +9,7 @@ import java.util.Objects;
 
 class ControlPanel extends JPanel {
 
-  private Controller ctrl;
+  private final Controller ctrl;
   private ChangeRegionsDialog changeRegionsDialog;
 
   private JToolBar toolBar;
@@ -44,7 +44,7 @@ class ControlPanel extends JPanel {
     this.openButton = new JButton();
     this.openButton.setToolTipText("Load an input file");
     this.openButton.setIcon(new ImageIcon(getClass().getResource("/icons/open.png")));
-    this.openButton.addActionListener(e-> loadFile());
+    this.openButton.addActionListener(e -> loadFile());
     this.toolBar.add(this.openButton);
 
     this.toolBar.addSeparator();
@@ -52,13 +52,13 @@ class ControlPanel extends JPanel {
     this.mapButton = new JButton();
     this.mapButton.setToolTipText("Open Map Viewer");
     this.mapButton.setIcon(new ImageIcon(getClass().getResource("/icons/viewer.png")));
-    this.mapButton.addActionListener(e-> new MapWindow(this.ctrl));
+    this.mapButton.addActionListener(e -> new MapWindow(this.ctrl));
     this.toolBar.add(this.mapButton);
 
     this.regionsButton = new JButton();
     this.regionsButton.setToolTipText("Change Regions");
     this.regionsButton.setIcon(new ImageIcon(getClass().getResource("/icons/regions.png")));
-    this.regionsButton.addActionListener(e->this.changeRegionsDialog.open(ViewUtils.getWindow(this))); //Terminar, falta change regions para q funsione open
+    this.regionsButton.addActionListener(e -> this.changeRegionsDialog.open(ViewUtils.getWindow(this))); //Terminar, falta change regions para q funsione open
     this.toolBar.add(this.regionsButton);
 
     this.toolBar.addSeparator();
@@ -66,7 +66,7 @@ class ControlPanel extends JPanel {
     this.runButton = new JButton();
     this.runButton.setToolTipText("Run Simulation");
     this.runButton.setIcon(new ImageIcon(getClass().getResource("/icons/run.png")));
-    this.runButton.addActionListener(e->startSimulation());
+    this.runButton.addActionListener(e -> startSimulation());
     this.toolBar.add(this.runButton);
 
     this.toolBar.addSeparator();
@@ -97,12 +97,12 @@ class ControlPanel extends JPanel {
     this.toolBar.add(quitButton);
   }
 
-  private void loadFile(){
+  private void loadFile() {
     int returnVal = this.fc.showOpenDialog(ViewUtils.getWindow(this));//devuelve un código numérico que devuelve la ventana para decirte que boton se ha pulsado.
-    if(returnVal == JFileChooser.APPROVE_OPTION){
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
       File file = this.fc.getSelectedFile();
 
-      try{
+      try {
         java.io.InputStream is = new java.io.FileInputStream(file);
         org.json.JSONObject jsonInput = new org.json.JSONObject(new org.json.JSONTokener(is));
 
@@ -111,10 +111,10 @@ class ControlPanel extends JPanel {
         int width = jsonInput.getInt("width");
         int height = jsonInput.getInt("height");
 
-        this.ctrl.reset(cols,rows,width,height);
+        this.ctrl.reset(cols, rows, width, height);
         this.ctrl.loadData(jsonInput);
 
-      }catch(Exception e){
+      } catch (Exception e) {
         ViewUtils.showErrorMsg("Error loading file" + e.getMessage());
       }
     }
@@ -131,20 +131,20 @@ class ControlPanel extends JPanel {
     this.stopButton.setEnabled(true);
   }
 
-  private void startSimulation(){
+  private void startSimulation() {
     this.stopped = false;
     setButtonsEnabled(false); //Deshabilita todos los botones al empezar.
 
-    try{
+    try {
       double dt = Double.parseDouble(this.deltaTimeField.getText());
       int steps = (Integer) this.stepsSpinner.getValue();
-      runSim(steps,dt);
+      runSim(steps, dt);
 
-    }catch(NumberFormatException e){
+    } catch (NumberFormatException e) {
       ViewUtils.showErrorMsg("Invalid Delta time format");
       this.stopped = true;
       setButtonsEnabled(true);
-    }catch(Exception e){
+    } catch (Exception e) {
       ViewUtils.showErrorMsg("Error starting the simulation.");
       this.stopped = true;
       setButtonsEnabled(true);

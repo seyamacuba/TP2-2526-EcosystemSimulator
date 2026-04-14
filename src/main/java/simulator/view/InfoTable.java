@@ -6,8 +6,8 @@ import java.awt.*;
 
 public class InfoTable extends JPanel {
 
-  private String title;
-  private TableModel tableModel;
+  private final String title;
+  private final TableModel tableModel;
 
   InfoTable(String title, TableModel tableModel) {
     this.title = title;

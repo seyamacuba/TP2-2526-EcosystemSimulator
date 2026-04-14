@@ -16,9 +16,8 @@ public class Sheep extends Animal {
   final static double DESIRE_THRESHOLD_SHEEP = 65.0;
   final static double DESIRE_INCREASE_RATE_SHEEP = 40.0;
   final static double PREGNANT_PROBABILITY_SHEEP = 0.9;
-
-  private Animal dangerSource;
   private final SelectionStrategy dangerStrategy;
+  private Animal dangerSource;
 
   public Sheep(SelectionStrategy mateStrategy, SelectionStrategy dangerStrategy, Vector2D pos) {
     super(SHEEP_GENETIC_CODE, Diet.HERBIVORE, INIT_SIGHT_SHEEP, INIT_SPEED_SHEEP, mateStrategy, pos);
@@ -107,7 +106,6 @@ public class Sheep extends Animal {
     }
   }
 
-
   private void updateDanger(double dt) {
     // Comprobar si hay peligro
     if (dangerSource != null && (dangerSource.getState() == State.DEAD ||
@@ -146,7 +144,6 @@ public class Sheep extends Animal {
     }
   }
 
-
   private void updateMate(double dt) {
     // Comprobar pareja
     if (getMateTarget() != null && (getMateTarget().getState() == State.DEAD ||
@@ -183,7 +180,6 @@ public class Sheep extends Animal {
         setMateTarget(null);
       }
     }
-
 
     // Cambios de estado
     List<Animal> wolves = getRegionMngr().getAnimalsInRange(this,

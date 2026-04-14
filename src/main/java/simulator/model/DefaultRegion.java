@@ -15,5 +15,3 @@ public class DefaultRegion extends Region {
     return "DefaultRegion";
   }
 }
-
-

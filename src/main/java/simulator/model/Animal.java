@@ -236,7 +236,6 @@ public abstract class Animal implements Entity, AnimalInfo {
     return baby != null;
   }
 
-
   //MÉTODOS:
   protected Vector2D adjustPos(Vector2D pos, int width, int height) {  //metodo de Ajustar Posiciones
     double x = pos.getX();

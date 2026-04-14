@@ -1,14 +1,13 @@
 package simulator.view;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import simulator.control.Controller;
 import simulator.launcher.Main;
 import simulator.model.AnimalInfo;
 import simulator.model.EcoSysObserver;
 import simulator.model.MapInfo;
 import simulator.model.RegionInfo;
-import simulator.control.Controller;
-import org.json.JSONObject;
-import org.json.JSONArray;
-
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -25,15 +24,15 @@ class ChangeRegionsDialog extends JDialog implements EcoSysObserver {
 
 
   private DefaultTableModel dataTableModel;
-  private Controller ctrl;
+  private final Controller ctrl;
   private List<JSONObject> regionsInfo;
 
-  private String[] headers = { "Key", "Value", "Description" };
+  private final String[] headers = {"Key", "Value", "Description"};
 
   private JComboBox<String> regionsCombo; // atributo de clase para acceder desde el listener
 
   ChangeRegionsDialog(Controller ctrl) {
-    super((Frame)null, true);
+    super((Frame) null, true);
     this.ctrl = ctrl;
     initGUI();
     ctrl.addObserver(this);
@@ -108,8 +107,8 @@ class ChangeRegionsDialog extends JDialog implements EcoSysObserver {
       try {
         int fromRow = Integer.parseInt((String) fromRowModel.getSelectedItem());
         int toRow = Integer.parseInt((String) toRowModel.getSelectedItem());
-        int fromCol =  Integer.parseInt((String) fromColModel.getSelectedItem());
-        int toCol =  Integer.parseInt((String) toColModel.getSelectedItem());
+        int fromCol = Integer.parseInt((String) fromColModel.getSelectedItem());
+        int toCol = Integer.parseInt((String) toColModel.getSelectedItem());
         //Construimos data con los valores de la tabla
         JSONObject data = new JSONObject();
         for (int i = 0; i < dataTableModel.getRowCount(); i++) {
@@ -184,7 +183,8 @@ class ChangeRegionsDialog extends JDialog implements EcoSysObserver {
   public void onAdvance(double time, MapInfo map, List<AnimalInfo> animals, double dt) {
 
   }
-//Rellena los comboboxes de rango segun las dimensiones del mapa
+
+  //Rellena los comboboxes de rango segun las dimensiones del mapa
   private void updateRangeModels(MapInfo map) {
     fromRowModel.removeAllElements();
     toRowModel.removeAllElements();
@@ -205,7 +205,7 @@ class ChangeRegionsDialog extends JDialog implements EcoSysObserver {
     dataTableModel.setRowCount(0);
     JSONObject data = regionsInfo.get(index).getJSONObject("data");
     for (String key : data.keySet()) {
-      this.dataTableModel.addRow(new Object[] { key, "", data.getString(key)});
+      this.dataTableModel.addRow(new Object[]{key, "", data.getString(key)});
     }
   }
 }

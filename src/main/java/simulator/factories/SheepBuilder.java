@@ -49,7 +49,6 @@ public class SheepBuilder extends Builder<Animal> {
       mateStrategy = strategyFactory.createInstance(defaultMate);
     }
 
-
     // 3. ESTRATEGIA DANGER
     SelectionStrategy dangerStrategy;
     if (data.has("danger_strategy")) {
@@ -62,7 +61,6 @@ public class SheepBuilder extends Builder<Animal> {
     }
 
     return new Sheep(mateStrategy, dangerStrategy, position);
-
   }
 
   @Override

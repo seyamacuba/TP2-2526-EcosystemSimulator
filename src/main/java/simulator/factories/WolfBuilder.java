@@ -8,7 +8,6 @@ import simulator.model.Animal;
 import simulator.model.SelectionStrategy;
 import simulator.model.Wolf;
 
-
 public class WolfBuilder extends Builder<Animal> {
 
   private final Factory<SelectionStrategy> strategyFactory;
