@@ -51,7 +51,7 @@ class ControlPanel extends JPanel {
 
     this.mapButton = new JButton();
     this.mapButton.setToolTipText("Open Map Viewer");
-    this.mapButton.setIcon(new ImageIcon(getClass().getResource("/icons/MapWindow.png")));
+    this.mapButton.setIcon(new ImageIcon(getClass().getResource("/icons/viewer.png")));
     this.mapButton.addActionListener(e-> new MapWindow(this.ctrl));
     this.toolBar.add(this.mapButton);
 
@@ -83,7 +83,7 @@ class ControlPanel extends JPanel {
     this.toolBar.add(this.stepsSpinner);
 
     this.toolBar.add(new JLabel(" Delta-Time: "));
-    this.deltaTimeField = new JTextField("2500.0");
+    this.deltaTimeField = new JTextField("0.3");
     this.deltaTimeField.setMaximumSize(new Dimension(80, 40));
     this.toolBar.add(this.deltaTimeField);
 
