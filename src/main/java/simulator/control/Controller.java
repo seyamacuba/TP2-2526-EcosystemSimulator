@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Controller {
 
-  private Simulator sim;
+  private final Simulator sim;
 
   public Controller(Simulator sim) {
     if (sim == null) throw new IllegalArgumentException("Simulator cannot be null");
@@ -116,11 +116,11 @@ public class Controller {
     JSONObject result = new JSONObject();
     result.put("in", initState);
     result.put("out", finalState);
-    p.println(result.toString());
+    p.println(result);
   }
 
   //la GUI no toca el simulador directamente, pero si controller
-  public void reset(int cols,  int rows, int width, int height) {
+  public void reset(int cols, int rows, int width, int height) {
     sim.reset(cols, rows, width, height);
   }
 

@@ -60,4 +60,3 @@ public abstract class Region implements Entity, FoodSupplier, RegionInfo {
   }
   //Explicar porque hacer "return animals" no funciona.
 }
-

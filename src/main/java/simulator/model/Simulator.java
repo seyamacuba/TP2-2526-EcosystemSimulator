@@ -17,7 +17,7 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
   private List<Animal> animals;
   private double time;
 
-  private List<EcoSysObserver> observers;
+  private final List<EcoSysObserver> observers;
 
   public Simulator(int cols, int rows, int width, int height,
                    Factory<Animal> animalsFactory, Factory<Region> regionsFactory) {
@@ -130,7 +130,7 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
     }
 
     List<AnimalInfo> animals = new ArrayList<>(this.animals);//copia
-    for(EcoSysObserver o : observers) {
+    for (EcoSysObserver o : observers) {
       o.onAdvance(time, regionMngr, animals, dt);
     }
 
@@ -154,38 +154,39 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
   //   "state": s
   //  }
 
-  public void reset(int cols, int rows, int width, int height){
-    if (cols<=0 || rows<=0 || width<=0 || height<=0) {
+  public void reset(int cols, int rows, int width, int height) {
+    if (cols <= 0 || rows <= 0 || width <= 0 || height <= 0) {
       throw new IllegalArgumentException("Invalid map dimensions");
     }
-    if(this.animals.isEmpty()){
+    if (this.animals.isEmpty()) {
       this.animals = new ArrayList<>(); //Si no hay, crea una lista de animales.
-    }else{
+    } else {
       this.animals.clear(); //Si no limpia.
     }
     this.time = 0.0;
     this.regionMngr = new RegionManager(cols, rows, width, height);
 
     List<AnimalInfo> animals = new ArrayList<>(this.animals); //copia para enviar
-    for(EcoSysObserver o : observers){
+    for (EcoSysObserver o : observers) {
       o.onReset(time, regionMngr, animals); //aviso a cada observer
     }
   }
 
   @Override
-  public void addObserver(EcoSysObserver o){
-    if(o == null){
+  public void addObserver(EcoSysObserver o) {
+    if (o == null) {
       throw new IllegalArgumentException("Null observer");
     }
-    if(!observers.contains(o)){ //si no esta en la lista ya, no dupes
+    if (!observers.contains(o)) { //si no esta en la lista ya, no dupes
       observers.add(o);
       //Lo he añadido dentro del if porque entiendo que solo tiene que notificar si es añadido
       List<AnimalInfo> animals = new ArrayList<>(this.animals); //enviamos copia, no quiero que me lo toquen
       o.onRegister(time, regionMngr, animals); //envio noti cuando alguien addObserver
     }
   }
+
   @Override
-  public void removeObserver(EcoSysObserver o){
+  public void removeObserver(EcoSysObserver o) {
     observers.remove(o); //si esta en la lista lo mata
   }
 }

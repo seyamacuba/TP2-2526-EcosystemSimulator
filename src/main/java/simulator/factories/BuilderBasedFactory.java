@@ -9,13 +9,10 @@ public class BuilderBasedFactory<T> implements Factory<T> {
   private final List<JSONObject> buildersInfo;
 
   public BuilderBasedFactory() {
-    // Create a HashMap for builders, and a LinkedList buildersInfo
-    // …
     this.builders = new HashMap<>();
     this.buildersInfo = new LinkedList<>();
   }
 
-  //FALTA ACABAR LO DE ABAJO MIAU
   public BuilderBasedFactory(List<Builder<T>> builders) {
     this();
     if (builders == null) {

@@ -3,14 +3,13 @@ package simulator.view;
 import simulator.control.Controller;
 
 import javax.swing.*;
-import javax.swing.text.View;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class MainWindow extends JFrame {
 
-  private Controller ctrl; //para hablar con el controller, suena esquizofrenico
+  private final Controller ctrl; //para hablar con el controller, suena esquizofrenico
 
   public MainWindow(Controller ctrl) {
     super("[ECOSYSTEM SIMULATOR]");
@@ -49,7 +48,7 @@ public class MainWindow extends JFrame {
     // TODO llama a ViewUtils.quit(MainWindow.this) en el método windowClosing
     addWindowListener(new WindowAdapter() {
       @Override
-      public void windowClosing(WindowEvent e){
+      public void windowClosing(WindowEvent e) {
         ViewUtils.quit(MainWindow.this);
       }
     });
