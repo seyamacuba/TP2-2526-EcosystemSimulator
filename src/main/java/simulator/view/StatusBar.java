@@ -49,7 +49,10 @@ class StatusBar extends JPanel implements EcoSysObserver {
   private void updateInfo(double time, MapInfo map, List<AnimalInfo> animals){
     this.timeLabel.setText("Time: " + String.format("%.3f", time));
     this.animalesLabel.setText("Total Animals: " + animals.size());
-    this.dimensionesLabel.setText("Dimension: " + map.getWidth() + "x" + map.getHeight());
+    this.dimensionesLabel.setText(
+      "Dimension: " + map.getWidth() + "x" + map.getHeight() +
+      " Cells: " + map.getRows() + "x" + map.getCols()
+    );
   }
 
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {

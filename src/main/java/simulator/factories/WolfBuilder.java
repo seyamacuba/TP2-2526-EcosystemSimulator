@@ -1,65 +1,28 @@
 package simulator.factories;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import simulator.misc.Utils;
 import simulator.misc.Vector2D;
 import simulator.model.Animal;
 import simulator.model.SelectionStrategy;
 import simulator.model.Wolf;
 
 
-public class WolfBuilder extends Builder<Animal> {
-
-  private final Factory<SelectionStrategy> strategyFactory;
+public class WolfBuilder extends AnimalBuilder {
 
   public WolfBuilder(Factory<SelectionStrategy> strategyFactory) {
-    super("wolf", "Wolf animal");
-    this.strategyFactory = strategyFactory;
+    super("wolf", "Wolf animal", strategyFactory);
   }
 
   @Override
   protected Animal createInstance(JSONObject data) {
     // 1. POSICIÓN (O es un array exacto [x,y] o es null)
-    Vector2D position = null;
-    if (data.has("pos")) {
-      JSONObject pos = data.getJSONObject("pos");
-
-      JSONArray xRange = pos.getJSONArray("x_range");
-      JSONArray yRange = pos.getJSONArray("y_range");
-      double xMin = xRange.getDouble(0);
-      double xMax = xRange.getDouble(1);
-      double yMin = yRange.getDouble(0);
-      double yMax = yRange.getDouble(1);
-
-      // Generar posición aleatoria dentro del rango
-      double x = xMin + Utils.RAND.nextDouble() * (xMax - xMin);
-      double y = yMin + Utils.RAND.nextDouble() * (yMax - yMin);
-
-      position = new Vector2D(x, y);
-    }
+    Vector2D position = parseRandomPos(data);
 
     // 2. ESTRATEGIA MATE
-    SelectionStrategy mateStrategy;
-    if (data.has("mate_strategy")) {
-      mateStrategy = strategyFactory.createInstance(data.getJSONObject("mate_strategy"));
-    } else {
-      // Valor por defecto: SelectFirst
-      JSONObject defaultMate = new JSONObject();
-      defaultMate.put("type", "first");
-      mateStrategy = strategyFactory.createInstance(defaultMate);
-    }
+    SelectionStrategy mateStrategy = parseStrategy(data, "mate_strategy");
 
     // 3. ESTRATEGIA HUNT
-    SelectionStrategy huntStrategy;
-    if (data.has("hunt_strategy")) {
-      huntStrategy = strategyFactory.createInstance(data.getJSONObject("hunt_strategy"));
-    } else {
-      // Valor por defecto: SelectFirst
-      JSONObject defaultHunt = new JSONObject();
-      defaultHunt.put("type", "first");
-      huntStrategy = strategyFactory.createInstance(defaultHunt);
-    }
+    SelectionStrategy huntStrategy = parseStrategy(data, "hunt_strategy");
 
     return new Wolf(mateStrategy, huntStrategy, position);
   }

@@ -7,22 +7,27 @@ import simulator.model.MapInfo;
 import simulator.model.RegionInfo;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class MapWindow extends JFrame implements EcoSysObserver {
 
-  private final Controller ctrl;
   private final MapViewer mapViewer;
 
   public MapWindow(Controller ctrl) {
     super("[MAP VIEW]");
-    this.ctrl = ctrl;
 
     this.mapViewer = new MapViewer();
     setContentPane(mapViewer);
 
-    this.ctrl.addObserver(this);
+    ctrl.addObserver(this);
+
+    addWindowListener(new java.awt.event.WindowAdapter() {
+      @Override
+      public void windowClosing(java.awt.event.WindowEvent e) {
+        ctrl.removeObserver(MapWindow.this);
+        dispose();
+      }
+    });
 
     pack();
     setVisible(true);
@@ -30,14 +35,18 @@ public class MapWindow extends JFrame implements EcoSysObserver {
 
   @Override
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {
-    mapViewer.reset(time, map, animals);
-    pack();
+    SwingUtilities.invokeLater(() -> {
+      mapViewer.reset(time, map, animals);
+      pack();
+    });
   }
 
   @Override
   public void onReset(double time, MapInfo map, List<AnimalInfo> animals) {
-    mapViewer.reset(time, map, animals);
-    pack();
+    SwingUtilities.invokeLater(() -> {
+      mapViewer.reset(time, map, animals);
+      pack();
+    });
   }
 
   @Override
@@ -50,6 +59,9 @@ public class MapWindow extends JFrame implements EcoSysObserver {
 
   @Override
   public void onAdvance(double time, MapInfo map, List<AnimalInfo> animals, double dt) {
-    mapViewer.update(animals, time);
+    SwingUtilities.invokeLater(() -> {
+      mapViewer.update(animals, time);
+      pack();
+    });
   }
 }

@@ -12,10 +12,10 @@ import simulator.model.SelectionStrategy;
 import simulator.model.Simulator;
 import simulator.view.MainWindow;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.SwingUtilities;
 
 public class Main {
 
@@ -23,18 +23,18 @@ public class Main {
   //
   private final static Double DEFAULT_TIME = 10.0; // in seconds
   private final static Double DEFAULT_DELTA_TIME = 0.03; // in seconds
-  // some attributes to stores values corresponding to command-line parameters
-  //
-  private static Double time = null;
   public static Double deltaTime = DEFAULT_DELTA_TIME;
-  private static String inFile = null;
-  private static String outFile = null;
-  private static boolean simpleViewer = false;
-  private static ExecMode mode = ExecMode.BATCH;
   // Factorías
   public static Factory<SelectionStrategy> selectionStrategyFactory;
   public static Factory<Region> regionsFactory;
   public static Factory<Animal> animalsFactory;
+  // some attributes to stores values corresponding to command-line parameters
+  //
+  private static Double time = null;
+  private static String inFile = null;
+  private static String outFile = null;
+  private static boolean simpleViewer = false;
+  private static ExecMode mode = ExecMode.GUI;
 
   private static void parseArgs(String[] args) {
 
@@ -60,10 +60,10 @@ public class Main {
       //
       String[] remaining = line.getArgs();
       if (remaining.length > 0) {
-        String error = "Illegal arguments:";
+        StringBuilder error = new StringBuilder("Illegal arguments:");
         for (String o : remaining)
-          error += (" " + o);
-        throw new ParseException(error);
+          error.append(" ").append(o);
+        throw new ParseException(error.toString());
       }
 
     } catch (ParseException e) {
@@ -95,9 +95,9 @@ public class Main {
       .build());
     // simple viewer
     cmdLineOptions.addOption(Option.builder("sv").longOpt("simple-viewer").desc("Show the viewer window in console mode.").build());
-   //GUI
+    //GUI
     cmdLineOptions.addOption(Option.builder("m").longOpt("mode").hasArg()
-      .desc("Execution mode. Possible values: 'batch' (default), 'gui'.").build());
+      .desc("Execution mode. Possible values: 'batch' (Batch mode), 'gui' (Graphical User Interface mode). Default value: 'gui'.").build());
     return cmdLineOptions;
   }
 
@@ -149,7 +149,7 @@ public class Main {
   }
 
   private static void parseModeOption(CommandLine line) throws ParseException {
-    String modeStr = line.getOptionValue("m", ExecMode.BATCH.getTag());
+    String modeStr = line.getOptionValue("m", ExecMode.GUI.getTag());
     for (ExecMode m : ExecMode.values()) {
       if (m.getTag().equals(modeStr)) {
         mode = m;
@@ -233,9 +233,9 @@ public class Main {
     }
 
     // Dimensiones por defecto si no hay fichero
-    int cols   = inputData != null ? inputData.getInt("cols")   : 20;
-    int rows   = inputData != null ? inputData.getInt("rows")   : 15;
-    int width  = inputData != null ? inputData.getInt("width")  : 800;
+    int cols = inputData != null ? inputData.getInt("cols") : 20;
+    int rows = inputData != null ? inputData.getInt("rows") : 15;
+    int width = inputData != null ? inputData.getInt("width") : 800;
     int height = inputData != null ? inputData.getInt("height") : 600;
 
     Simulator sim = new Simulator(cols, rows, width, height, animalsFactory, regionsFactory);

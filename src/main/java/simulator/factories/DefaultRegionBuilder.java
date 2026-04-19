@@ -18,9 +18,4 @@ public class DefaultRegionBuilder extends Builder<Region> {
       throw new IllegalArgumentException("Error creando el objeto");
     }
   }
-
-  @Override
-  protected void fillInData(JSONObject o) {
-    o.put("info", "No requiere parámetros adicionales");
-  }
 }

@@ -5,10 +5,8 @@ import simulator.model.*;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
   private List<Object[]> rows;
@@ -49,7 +47,7 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
     List<Object[]> newRows = new ArrayList<>();
 
     // EMPIEZA EL BUCLE
-    for(MapInfo.RegionData rd : map) {
+    for (MapInfo.RegionData rd : map) {
 
       // Contar animales por dieta en esta región
       int[] counts = new int[Diet.values().length];
@@ -77,33 +75,6 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
       fireTableDataChanged();
     });
   }
-
-  /*
-    public void updateTable(MapInfo map) {
-    rows.clear();
-
-    for(MapInfo.RegionData rd : map) {
-      //contar animales por dieta en esta región
-      int[] counts = new int[Diet.values().length];
-
-      for (AnimalInfo a : rd.r().getAnimalsInfo()) {
-        counts[a.getDiet().ordinal()]++;
-      }
-      // Construimos la fila: [row, col, descripcion, count0, count1, ...]
-      Object[] row = new Object[3 + Diet.values().length];
-      row[0] = rd.row();
-      row[1] = rd.col();
-      row[2] = rd.r().toString();
-      for (int i = 0; i < Diet.values().length; i++) {
-        row[3 + i] = counts[i];
-      }
-        rows.add(row);
-      }
-
-    fireTableDataChanged();
-  }
-
-   */
 
 
   @Override

@@ -27,27 +27,7 @@ public class Controller {
     if (data == null) {
       throw new IllegalArgumentException("Null data");
     }
-
-    if (data.has("regions")) {
-      JSONArray regions = data.getJSONArray("regions");
-      for (int i = 0; i < regions.length(); i++) {
-        JSONObject entry = regions.getJSONObject(i);
-        JSONArray rowRange = entry.getJSONArray("row");
-        JSONArray colRange = entry.getJSONArray("col");
-        JSONObject spec = entry.getJSONObject("spec");
-
-        int rowFrom = rowRange.getInt(0);
-        int rowTo = rowRange.getInt(1);
-        int colFrom = colRange.getInt(0);
-        int colTo = colRange.getInt(1);
-
-        for (int r = rowFrom; r <= rowTo; r++) {
-          for (int c = colFrom; c <= colTo; c++) {
-            sim.setRegion(r, c, spec);
-          }
-        }
-      }
-    }
+    applyRegions(data);
 
     if (data.has("animals")) {
       JSONArray animals = data.getJSONArray("animals");
@@ -74,6 +54,30 @@ public class Controller {
       ));
     }
     return ol;
+  }
+
+  private void applyRegions(JSONObject rs) {
+    if (!rs.has("regions")) return;
+
+    JSONArray regions = rs.getJSONArray("regions");
+    for (int i = 0; i < regions.length(); i++) {
+      JSONObject entry = regions.getJSONObject(i);
+
+      JSONArray rowRange = entry.getJSONArray("row");
+      JSONArray colRange = entry.getJSONArray("col");
+      JSONObject spec = entry.getJSONObject("spec");
+
+      int rowFrom = rowRange.getInt(0);
+      int rowTo = rowRange.getInt(1);
+      int colFrom = colRange.getInt(0);
+      int colTo = colRange.getInt(1);
+
+      for (int r = rowFrom; r <= rowTo; r++) {
+        for (int c = colFrom; c <= colTo; c++) {
+          sim.setRegion(r, c, spec);
+        }
+      }
+    }
   }
 
   public void run(double t, double dt, boolean sv, OutputStream out) {
@@ -136,28 +140,8 @@ public class Controller {
     if (rs == null) {
       throw new IllegalArgumentException("Null regions");
     }
-    if (rs.has("regions")) {
-      JSONArray regions = rs.getJSONArray("regions");
 
-      for (int i = 0; i < regions.length(); i++) {
-        JSONObject entry = regions.getJSONObject(i);
-
-        JSONArray rowRange = entry.getJSONArray("row");
-        JSONArray colRange = entry.getJSONArray("col");
-        JSONObject spec = entry.getJSONObject("spec");
-
-        int rowFrom = rowRange.getInt(0);
-        int rowTo = rowRange.getInt(1);
-        int colFrom = colRange.getInt(0);
-        int colTo = colRange.getInt(1);
-
-        for (int r = rowFrom; r <= rowTo; r++) {
-          for (int c = colFrom; c <= colTo; c++) {
-            sim.setRegion(r, c, spec);
-          }
-        }
-      }
-    }
+    applyRegions(rs);
   }
   //Estructura
   //{
