@@ -4,17 +4,20 @@ import simulator.control.Controller;
 import simulator.launcher.Main;
 
 import javax.swing.*;
+import javax.swing.text.View;
 import java.awt.*;
 import java.io.File;
 import java.util.Objects;
+
 
 class ControlPanel extends JPanel {
 
   private final Controller ctrl;
   private ChangeRegionsDialog changeRegionsDialog;
+  private JSpinner delaySpinner; //Creo un nuevo spinner.
 
   private JFileChooser fc;
-  private boolean stopped = true; // utilizado en los botones de run/stop
+  //private boolean stopped = true; // utilizado en los botones de run/stop
 
   private JButton quitButton;
   private JButton openButton;
@@ -24,6 +27,7 @@ class ControlPanel extends JPanel {
   private JButton stopButton;
   private JSpinner stepsSpinner;
   private JTextField deltaTimeField;
+  volatile Thread thread;
 
   ControlPanel(Controller ctrl) {
     this.ctrl = ctrl;
@@ -74,7 +78,11 @@ class ControlPanel extends JPanel {
     this.stopButton = new JButton();
     this.stopButton.setToolTipText("Stop Simulation");
     this.stopButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/icons/stop.png"))));
-    this.stopButton.addActionListener(e -> this.stopped = true);
+    this.stopButton.addActionListener(e -> {
+      if(this.thread != null){
+        this.thread.interrupt();
+      }
+    });
     toolBar.add(this.stopButton);
 
     toolBar.add(new JLabel(" Steps: "));
@@ -86,6 +94,13 @@ class ControlPanel extends JPanel {
     this.deltaTimeField = new JTextField(String.valueOf(Main.deltaTime));
     this.deltaTimeField.setMaximumSize(new Dimension(80, 40));
     toolBar.add(this.deltaTimeField);
+
+    toolBar.add(new JLabel("Delay:"));
+
+    this.delaySpinner = new JSpinner(new SpinnerNumberModel(0,0,1000,1));
+    this.delaySpinner.setMaximumSize(new Dimension(80,40));
+    this.delaySpinner.setToolTipText("Retardo entre pasos de simulación consecutivos");
+    toolBar.add(this.delaySpinner);
 
     // Quit Button
     toolBar.add(Box.createGlue()); // this aligns the button to the right
@@ -132,39 +147,54 @@ class ControlPanel extends JPanel {
   }
 
   private void startSimulation() {
-    this.stopped = false;
+
     setButtonsEnabled(false); //Deshabilita todos los botones al empezar.
+    this.stopButton.setEnabled(true); //El único que puede funcionar.
 
-    try {
-      double dt = Double.parseDouble(this.deltaTimeField.getText());
-      int steps = (Integer) this.stepsSpinner.getValue();
-      runSim(steps, dt);
+    this.thread = new Thread(() -> { //Abro hilo secundario
+      try{
+        double dt= Double.parseDouble(this.deltaTimeField.getText());
+        int steps = (Integer) this.stepsSpinner.getValue();
 
-    } catch (NumberFormatException e) {
-      ViewUtils.showErrorMsg("Invalid Delta time format");
-      this.stopped = true;
-      setButtonsEnabled(true);
-    } catch (Exception e) {
-      ViewUtils.showErrorMsg("Error starting the simulation.");
-      this.stopped = true;
-      setButtonsEnabled(true);
-    }
+        runSim(steps,dt);
+      }catch(NumberFormatException e){
+        ViewUtils.showErrorMsg("Formato Delta Time inválido.");
+      } catch(Exception e){
+        ViewUtils.showErrorMsg("Error en la inicialización de la simulación.");
+      } finally{
+        SwingUtilities.invokeLater(() -> { //Rehabilito la interfaz, cuando acaba.
+          setButtonsEnabled(true);
+          this.thread = null;
+        });
+      }
+    });
+
+    this.thread.start();
   }
 
   private void runSim(int n, double dt) {
-    if (n > 0 && !this.stopped) {
-      try {
-        this.ctrl.advance(dt);
-        SwingUtilities.invokeLater(() -> runSim(n - 1, dt));
-      } catch (Exception e) {
+    //int delay = (Integer) this.delaySpinner.getValue(); //Obtengo el valor del delay del spinner antes de empezar
 
+    //HILO SECUNDARIO
+    while (n > 0 && !Thread.currentThread().isInterrupted()) { //Este es el hilo que se ejecuta el modelo, la simulación.
+      try {
+        this.ctrl.advance(dt); //Aqui se ejecuta :b
+
+        int delay = (Integer) this.delaySpinner.getValue(); //Permite cambiar mejor el delay mientras se ejecuta.
+        if(delay > 0){
+          Thread.sleep(delay);
+        }
+        //SwingUtilities.invokeLater(() -> runSim(n - 1, dt));
+      } catch (InterruptedException e) {
+        //Si el hilo es interrumpido mientras esta sleep, nos salimos.
+        Thread.currentThread().interrupt();
+        break;
+      }catch(Exception e){
         ViewUtils.showErrorMsg("Error during the simulation " + e.getMessage());
-        this.stopped = true;
-        setButtonsEnabled(true);
+        Thread.currentThread().interrupt();
+        break;
       }
-    } else {
-      setButtonsEnabled(true);
-      this.stopped = true;
+      n--; //Decremento el contador de pasos zzz
     }
   }
 }
