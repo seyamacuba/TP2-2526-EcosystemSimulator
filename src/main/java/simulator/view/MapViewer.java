@@ -23,24 +23,22 @@ public class MapViewer extends AbstractMapViewer {
   int rWidth;
   int rHeight;
 
-  State currentState; // Mostramos sólo animales con este estado. Los posibles valores de currState
-  // son null, y los valores de Animal.State.values(). Si es null mostramos tot.
+  State currentState; // Guarda el estado de los animales que quiero mostrar: null muestra todos, luego tengo normal, hungry, dead...
 
-  Map<String, SpeciesInfo> kindsInfo = new HashMap<>();// Un mapa para la información sobre las especies.
+  Map<String, SpeciesInfo> kindsInfo = new HashMap<>(); // Un mapa para la información sobre las especies.
 
-  private int width;// Anchura/altura de la simulación -- se supone que siempre van a ser iguales al tamaño del componente
-  private int height; // Número de filas/columnas de la simulación (regiones)
+  private int width; //Anchura/altura de la simulación
+  private int height; //Filas/columnas de la simulación (regiones)
 
   private int rows;
   private int cols;
 
-  volatile private Collection<AnimalInfo> objs;// En estos atributos guardamos la lista de animales y el tiempo que hemos
-
-  volatile private Double time;// recibido la última vez para dibujarlos.
+  volatile private Collection<AnimalInfo> objs; //En estos atributos guardamos la lista de animales y el tiempo actual
+  volatile private Double time;
 
   private final Font textFont = new Font("Arial", Font.BOLD, 12);
 
-  private boolean showHelp;// Indica si mostramos el texto la ayuda o no.
+  private boolean showHelp;
 
   public MapViewer() {
     initGUI();
@@ -103,7 +101,6 @@ public class MapViewer extends AbstractMapViewer {
     gr.setBackground(Color.WHITE);
     gr.clearRect(0, 0, width, height);
 
-
     if (objs != null) // Dibujar los animales, el tiempo, información sobre las especies, etc.
       drawObjects(gr, objs, time);
 
@@ -118,7 +115,6 @@ public class MapViewer extends AbstractMapViewer {
     //
     // h: toggle help
     // s: show animals of a specific state
-
   }
 
   private boolean visible(AnimalInfo a) {
@@ -188,8 +184,7 @@ public class MapViewer extends AbstractMapViewer {
 
   @Override
   public void update(List<AnimalInfo> objs, Double time) {
-    //      Store objs and time in the corresponding fields, and call repaint() to
-    //      redraw the component.
+    //      Store objs and time in the corresponding fields, and call repaint() to redraw the component.
     SwingUtilities.invokeLater(() -> {
       this.objs = objs;
       this.time = time;
@@ -224,5 +219,4 @@ public class MapViewer extends AbstractMapViewer {
       this.color = color;
     }
   }
-
 }

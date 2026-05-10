@@ -77,7 +77,6 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
     addAnimal(a);
   }
 
-  //miau
   public MapInfo getMapInfo() {
     return regionMngr;
   }

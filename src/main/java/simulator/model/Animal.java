@@ -220,7 +220,6 @@ public abstract class Animal implements Entity, AnimalInfo {
     this.mateStrategy = mateStrategy;
   }
 
-  //faltan estos de AnimalInfo, aunque esten con otros nombres
   @Override
   public Vector2D getPosition() {
     return pos;
@@ -298,10 +297,9 @@ public abstract class Animal implements Entity, AnimalInfo {
     pos = pos.plus(dest.minus(pos).direction().scale(speed));
   }
 
-  //Para el bug de los animales que vibran, tenian un dest, se movian pero luego se movian para el mismo dest
-  //se buguea en  Sheep updateDanger cuando no hay danger, en Wolf updateHunger cuando no hay presa y en ambos en  updateMate cuando no hay pareja
-  //vamos cuando target es null
-  protected void clearDestinationOrRandom() { //no se me ocurre nombre bonito
+  //Bug animales vibrando, tenian un dest y al moverse seguian con el mismo dest
+  //En Sheep updateDanger si danger==null,  Wolf updateHunger si prey==null y ambos en updateMate si mateTarget==null
+  protected void clearDestinationOrRandom() {
     if (getDestination() == null || getPosition().distanceTo(getDestination()) < COLLISION_RANGE) { //si estoy MUY cerca nuevo dest random
       double dx = Utils.RAND.nextDouble() * (regionMngr.getWidth() - 1);
       double dy = Utils.RAND.nextDouble() * (regionMngr.getHeight() - 1);
@@ -310,7 +308,7 @@ public abstract class Animal implements Entity, AnimalInfo {
   }
 
   @Override
-  public JSONObject asJSON() { //CORREGIR.
+  public JSONObject asJSON() {
     JSONObject obj = new JSONObject();
     obj.put("pos", new JSONArray(new double[]{pos.getX(), pos.getY()}));
     obj.put("gcode", geneticCode);

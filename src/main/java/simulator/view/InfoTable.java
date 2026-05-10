@@ -15,7 +15,7 @@ public class InfoTable extends JPanel {
     initGUI();
   }
 
-  private void initGUI() { //comments del profe
+  private void initGUI() {
     setLayout(new BorderLayout()); //cambiar el layout del panel a BorderLayout()
     setBorder(BorderFactory.createTitledBorder(title)); //añadir un borde con título al JPanel, con el texto this.title
     JTable table = new JTable(tableModel); //añadir un JTable (con barra de desplazamiento vertical) que use this.tableModel

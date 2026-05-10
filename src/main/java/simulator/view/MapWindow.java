@@ -33,7 +33,7 @@ public class MapWindow extends JFrame implements EcoSysObserver {
     setVisible(true);
   }
 
-  //creo que aqui ya sobran los invokelater pq estan en mapviewer ya, pero weno, doble delay yeee
+  //creo que aqui ya sobran los invokelater pq estan en mapviewer, pero los comento por si acaso
 
   @Override
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {
@@ -62,8 +62,7 @@ public class MapWindow extends JFrame implements EcoSysObserver {
   @Override
   public void onAdvance(double time, MapInfo map, List<AnimalInfo> animals, double dt) {
     SwingUtilities.invokeLater(() -> {
-      mapViewer.update(animals, time);
-      //pack();
+      mapViewer.update(animals, time); //no hace falta pack ya que  no cambia el tamano
     });
   }
 }

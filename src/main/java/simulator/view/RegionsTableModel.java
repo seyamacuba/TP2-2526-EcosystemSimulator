@@ -36,7 +36,6 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
     };
   }
 
-
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
     Object[] row = rows.get(rowIndex);
@@ -66,7 +65,6 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
 
       // Añadimos la fila a nuestra lista temporal
       newRows.add(row);
-
     }
 
     // 2. Sustituyo la lista original por la nueva de forma segura en el hilo de Swing
@@ -75,7 +73,6 @@ class RegionsTableModel extends AbstractTableModel implements EcoSysObserver {
       fireTableDataChanged();
     });
   }
-
 
   @Override
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {

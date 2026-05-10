@@ -16,7 +16,6 @@ class ControlPanel extends JPanel {
   private JSpinner delaySpinner; //Creo un nuevo spinner.
 
   private JFileChooser fc;
-  //private boolean stopped = true; // utilizado en los botones de run/stop
 
   private JButton quitButton;
   private JButton openButton;
@@ -33,7 +32,7 @@ class ControlPanel extends JPanel {
     initGUI();
   }
 
-  private void initGUI() { //el profe no sabe, toolabar huh
+  private void initGUI() {
     setLayout(new BorderLayout());
     JToolBar toolBar = new JToolBar();
     add(toolBar, BorderLayout.PAGE_START);
@@ -98,7 +97,7 @@ class ControlPanel extends JPanel {
 
     this.delaySpinner = new JSpinner(new SpinnerNumberModel(0,0,1000,1));
     this.delaySpinner.setMaximumSize(new Dimension(80,40));
-    this.delaySpinner.setToolTipText("Retardo entre pasos de simulación consecutivos");
+    this.delaySpinner.setToolTipText("Delay between consecutive simulation steps.");
     toolBar.add(this.delaySpinner);
 
     // Quit Button
@@ -134,7 +133,7 @@ class ControlPanel extends JPanel {
     }
   }
 
-  // Método auxiliar para no repetir código al activar/desactivar botones
+  // Funcion auxiliar para no repetir código al activar/desactivar botones
   private void setButtonsEnabled(boolean enabled) {
     this.openButton.setEnabled(enabled);
     this.mapButton.setEnabled(enabled);
@@ -159,11 +158,11 @@ class ControlPanel extends JPanel {
         runSim(steps,dt, delay);
       }catch(NumberFormatException e){
         SwingUtilities.invokeLater(() -> {
-          ViewUtils.showErrorMsg("Formato Delta Time inválido.");
+          ViewUtils.showErrorMsg("Invalid Delta Time format.");
         });
       } catch(Exception e){
         SwingUtilities.invokeLater(() -> {
-          ViewUtils.showErrorMsg("Error en la inicialización de la simulación.");
+          ViewUtils.showErrorMsg("Simulation initialisation error");
         });
       } finally{
         SwingUtilities.invokeLater(() -> { //Rehabilito la interfaz, cuando acaba.

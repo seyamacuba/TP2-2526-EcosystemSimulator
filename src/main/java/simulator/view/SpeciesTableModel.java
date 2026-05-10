@@ -11,7 +11,6 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-//La tabla animalets y cosas. Tengo que hacer la logica
 class SpeciesTableModel extends AbstractTableModel implements EcoSysObserver {
 
   private List<Object[]> rows;
@@ -84,7 +83,6 @@ class SpeciesTableModel extends AbstractTableModel implements EcoSysObserver {
     });//cambió la tablitaaa
   }
 
-  //amo el intelliJ
   @Override
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {
     updateTable(animals);
