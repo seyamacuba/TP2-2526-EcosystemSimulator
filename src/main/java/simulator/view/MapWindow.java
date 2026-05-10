@@ -33,22 +33,20 @@ public class MapWindow extends JFrame implements EcoSysObserver {
     setVisible(true);
   }
 
-  //creo que aqui ya sobran los invokelater pq estan en mapviewer, pero los comento por si acaso
-
   @Override
   public void onRegister(double time, MapInfo map, List<AnimalInfo> animals) {
-    //SwingUtilities.invokeLater(() -> {
+    SwingUtilities.invokeLater(() -> {
       mapViewer.reset(time, map, animals);
       pack();
-    //});
+    });
   }
 
   @Override
   public void onReset(double time, MapInfo map, List<AnimalInfo> animals) {
-    //SwingUtilities.invokeLater(() -> {
+    SwingUtilities.invokeLater(() -> {
       mapViewer.reset(time, map, animals);
       pack();
-    //});
+    });
   }
 
   @Override
