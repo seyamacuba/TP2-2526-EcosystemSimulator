@@ -4,6 +4,7 @@ import simulator.model.AnimalInfo;
 import simulator.model.MapInfo;
 import simulator.model.State;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -19,57 +20,27 @@ import java.util.Map.Entry;
 @SuppressWarnings("serial")
 public class MapViewer extends AbstractMapViewer {
 
-  // Anchura/altura de una región
-  //
-  // Width/height of a region
-  //
   int rWidth;
   int rHeight;
-  // Mostramos sólo animales con este estado. Los posibles valores de currState
+
+  State currentState; // Mostramos sólo animales con este estado. Los posibles valores de currState
   // son null, y los valores de Animal.State.values(). Si es null mostramos tot.
-  //
-  // We show the animals that have this state. The possible values of currentState
-  // are: null and the values returned by Animal.State.values(). If it is null we
-  // show all animals.
-  //
-  State currentState;
-  // Un mapa para la información sobre las especies.
-  //
-  // A map with the information for each species.
-  //
-  Map<String, SpeciesInfo> kindsInfo = new HashMap<>();
-  // Anchura/altura de la simulación -- se supone que siempre van a ser
-  // iguales al tamaño del componente
-  //
-  // Width/height of the simulation -- they will always be equal to the size
-  // of the component
-  //
-  private int width;
-  private int height;
-  // Número de filas/columnas de la simulación (regiones)
-  //
-  // Number of rows/cols of the simulation (regions)
-  //
+
+  Map<String, SpeciesInfo> kindsInfo = new HashMap<>();// Un mapa para la información sobre las especies.
+
+  private int width;// Anchura/altura de la simulación -- se supone que siempre van a ser iguales al tamaño del componente
+  private int height; // Número de filas/columnas de la simulación (regiones)
+
   private int rows;
   private int cols;
-  // En estos atributos guardamos la lista de animales y el tiempo que hemos
-  // recibido la última vez para dibujarlos.
-  //
-  // The value of these attributes are the list of animals and the time that we
-  // have received in the notification (those will be shown).
-  //
-  volatile private Collection<AnimalInfo> objs;
-  volatile private Double time;
-  // El font que usamos para dibujar texto.
-  //
-  // The font to be used for drawing text.
-  //
+
+  volatile private Collection<AnimalInfo> objs;// En estos atributos guardamos la lista de animales y el tiempo que hemos
+
+  volatile private Double time;// recibido la última vez para dibujarlos.
+
   private final Font textFont = new Font("Arial", Font.BOLD, 12);
-  // Indica si mostramos el texto la ayuda o no.
-  //
-  // Indicates if the 'help' information is visible or hidden.
-  //
-  private boolean showHelp;
+
+  private boolean showHelp;// Indica si mostramos el texto la ayuda o no.
 
   public MapViewer() {
     initGUI();
@@ -108,26 +79,15 @@ public class MapViewer extends AbstractMapViewer {
     addMouseListener(new MouseAdapter() {
 
       @Override
-      public void mouseEntered(MouseEvent e) {
-        // Esto es necesario para capturar las teclas cuando el ratón está sobre este
-        // componente.
-        //
-        // This is needed to capture keystroke when the mouse is over this component.
-        //
+      public void mouseEntered(MouseEvent e) { // Esto es necesario para capturar las teclas cuando el ratón está sobre este componente.
         requestFocus();
       }
     });
 
     // Por defecto mostramos todos los animales.
-    //
-    // By default, we show all animals.
-    //
     currentState = null;
 
     // Por defecto mostramos el texto de ayuda.
-    //
-    // By default, the 'help' message is visible.
-    //
     showHelp = true;
   }
 
@@ -139,24 +99,12 @@ public class MapViewer extends AbstractMapViewer {
     gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     gr.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-    // Cambiar el font para dibujar texto.
-    //
-    // Change the font to be used when drawing text.
-    //
-    g.setFont(textFont);
-
-    // Dibujar fondo blanco.
-    //
-    // Draw a white background.
-    //
+    g.setFont(textFont);// Cambiar el font para dibujar texto.
     gr.setBackground(Color.WHITE);
     gr.clearRect(0, 0, width, height);
 
-    // Dibujar los animales, el tiempo, información sobre las especies, etc.
-    //
-    // Draw the animals, the time, species information. etc.
-    //
-    if (objs != null)
+
+    if (objs != null) // Dibujar los animales, el tiempo, información sobre las especies, etc.
       drawObjects(gr, objs, time);
 
     // Texto de ayuda
@@ -187,25 +135,12 @@ public class MapViewer extends AbstractMapViewer {
     for (int i = 0; i <= cols; i++) g.drawLine(i * rWidth, 0, i * rWidth, height);
     for (int i = 0; i <= rows; i++) g.drawLine(0, i * rHeight, width, i * rHeight);
 
+    for (AnimalInfo a : animals) {  // Dibujar los animales.
 
-    // Dibujar los animales.
-    //
-    // Draw the animals
-    //
-    for (AnimalInfo a : animals) {
-
-      // Si no es visible saltamos la iteración.
-      //
-      // If the animal is not visible, we skip to the next iteration.
-      //
-      if (!visible(a))
+      if (!visible(a))// Si no es visible saltamos la iteración.
         continue;
 
-      // La información sobre la especie de 'a'.
-      //
-      // Information of the species of 'a'
-      //
-      SpeciesInfo speciesInfo = kindsInfo.get(a.getGeneticCode());
+      SpeciesInfo speciesInfo = kindsInfo.get(a.getGeneticCode());// La información sobre la especie de 'a'.
 
       // Si no existe la especie, la añadimos
       if (speciesInfo == null) {
@@ -245,9 +180,6 @@ public class MapViewer extends AbstractMapViewer {
   }
 
   // Un méto do que dibujar un texto con un rectángulo.
-  //
-  // A method for drawing a text with a rectangular border.
-  //
   void drawStringWithRect(Graphics2D g, int x, int y, String s) {
     Rectangle2D rect = g.getFontMetrics().getStringBounds(s, g);
     g.drawString(s, x, y);
@@ -258,39 +190,31 @@ public class MapViewer extends AbstractMapViewer {
   public void update(List<AnimalInfo> objs, Double time) {
     //      Store objs and time in the corresponding fields, and call repaint() to
     //      redraw the component.
-    this.objs = objs;
-    this.time = time;
-    repaint();
+    SwingUtilities.invokeLater(() -> {
+      this.objs = objs;
+      this.time = time;
+      repaint();
+    });
   }
 
   @Override
-  public void reset(double time, MapInfo map, List<AnimalInfo> animals) {
-    this.width = map.getWidth();
-    this.height = map.getHeight();
-    this.cols = map.getCols();
-    this.rows = map.getRows();
-    this.rWidth = width / cols;
-    this.rHeight = height / rows;
+  public void reset(double time, MapInfo map, List<AnimalInfo> animals) { //aqui no invokelater que se buguea el mapa
+      this.width = map.getWidth();
+      this.height = map.getHeight();
+      this.cols = map.getCols();
+      this.rows = map.getRows();
+      this.rWidth = width / cols;
+      this.rHeight = height / rows;
 
-    // Esto cambia el tamaño del componente, y así cambia el tamaño de la ventana
-    // porque en MapWindow llamamos a pack() después de llamar a reset.
-    //
-    // This line changes the size of the component, and thus the size of the window
-    // because MapWindow calls pack() after calling reset().
-    //
-    setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+      // Esto cambia el tamaño del componente, y así cambia el tamaño de la ventana
+      // porque en MapWindow llamamos a pack() después de llamar a reset.
+      setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
 
-    // Dibuja el estado.
-    //
-    // Draw the state.
-    //
-    update(animals, time);
+      // Dibuja el estado.
+      update(animals, time);
   }
 
   // Una clase auxiliar para almacenar información sobre una especie.
-  //
-  // An auxiliary class to store information about species.
-  //
   private static class SpeciesInfo {
     private Integer count;
     private final Color color;

@@ -186,18 +186,20 @@ class ChangeRegionsDialog extends JDialog implements EcoSysObserver {
 
   //Rellena los comboboxes de rango segun las dimensiones del mapa
   private void updateRangeModels(MapInfo map) {
-    fromRowModel.removeAllElements();
-    toRowModel.removeAllElements();
-    fromColModel.removeAllElements();
-    toColModel.removeAllElements();
-    for (int i = 0; i < map.getRows(); i++) {
-      fromRowModel.addElement(String.valueOf(i));
-      toRowModel.addElement(String.valueOf(i));
-    }
-    for (int i = 0; i < map.getCols(); i++) {
-      fromColModel.addElement(String.valueOf(i));
-      toColModel.addElement(String.valueOf(i));
-    }
+    SwingUtilities.invokeLater(() -> {
+      fromRowModel.removeAllElements();
+      toRowModel.removeAllElements();
+      fromColModel.removeAllElements();
+      toColModel.removeAllElements();
+      for (int i = 0; i < map.getRows(); i++) {
+        fromRowModel.addElement(String.valueOf(i));
+        toRowModel.addElement(String.valueOf(i));
+      }
+      for (int i = 0; i < map.getCols(); i++) {
+        fromColModel.addElement(String.valueOf(i));
+        toColModel.addElement(String.valueOf(i));
+      }
+    });
   }
 
   //Rellena la tabla con los parametros del tipo de region seleccionado

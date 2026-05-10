@@ -108,7 +108,6 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
       animals.remove(a);
     }
 
-
     // Paso 3: actualizar cada animal y su región
     for (Animal a : animals) {
       a.update(dt);
@@ -130,10 +129,9 @@ public class Simulator implements JSONable, Observable<EcoSysObserver> {
     }
 
     List<AnimalInfo> animals = new ArrayList<>(this.animals);//copia
-    for (EcoSysObserver o : observers) {
+    for (EcoSysObserver o : observers) { //Para cada uno de los osberver, les entrega los datos y los actualiza.
       o.onAdvance(time, regionMngr, animals, dt);
     }
-
   }
 
   public JSONObject asJSON() {
