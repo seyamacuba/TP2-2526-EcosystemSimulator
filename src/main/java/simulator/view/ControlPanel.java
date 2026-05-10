@@ -4,7 +4,6 @@ import simulator.control.Controller;
 import simulator.launcher.Main;
 
 import javax.swing.*;
-import javax.swing.text.View;
 import java.awt.*;
 import java.io.File;
 import java.util.Objects;
@@ -155,12 +154,17 @@ class ControlPanel extends JPanel {
       try{
         double dt= Double.parseDouble(this.deltaTimeField.getText());
         int steps = (Integer) this.stepsSpinner.getValue();
+        int delay = (Integer) this.delaySpinner.getValue(); //Obtengo el valor del delay del spinner antes de empezar
 
-        runSim(steps,dt);
+        runSim(steps,dt, delay);
       }catch(NumberFormatException e){
-        ViewUtils.showErrorMsg("Formato Delta Time inválido.");
+        SwingUtilities.invokeLater(() -> {
+          ViewUtils.showErrorMsg("Formato Delta Time inválido.");
+        });
       } catch(Exception e){
-        ViewUtils.showErrorMsg("Error en la inicialización de la simulación.");
+        SwingUtilities.invokeLater(() -> {
+          ViewUtils.showErrorMsg("Error en la inicialización de la simulación.");
+        });
       } finally{
         SwingUtilities.invokeLater(() -> { //Rehabilito la interfaz, cuando acaba.
           setButtonsEnabled(true);
@@ -172,25 +176,27 @@ class ControlPanel extends JPanel {
     this.thread.start();
   }
 
-  private void runSim(int n, double dt) {
-    //int delay = (Integer) this.delaySpinner.getValue(); //Obtengo el valor del delay del spinner antes de empezar
+  private void runSim(int n, double dt, int delay) { //delay como parametro pq lo pone en la practica, aunque sea molt innecessari
 
     //HILO SECUNDARIO
     while (n > 0 && !Thread.currentThread().isInterrupted()) { //Este es el hilo que se ejecuta el modelo, la simulación.
       try {
         this.ctrl.advance(dt); //Aqui se ejecuta :b
 
-        int delay = (Integer) this.delaySpinner.getValue(); //Permite cambiar mejor el delay mientras se ejecuta.
+        delay = (Integer) this.delaySpinner.getValue(); //Permite cambiar mejor el delay mientras se ejecuta.
         if(delay > 0){
           Thread.sleep(delay);
         }
+
         //SwingUtilities.invokeLater(() -> runSim(n - 1, dt));
       } catch (InterruptedException e) {
         //Si el hilo es interrumpido mientras esta sleep, nos salimos.
         Thread.currentThread().interrupt();
         break;
       }catch(Exception e){
-        ViewUtils.showErrorMsg("Error during the simulation " + e.getMessage());
+        SwingUtilities.invokeLater(() -> {
+          ViewUtils.showErrorMsg("Error during the simulation " + e.getMessage());
+        });
         Thread.currentThread().interrupt();
         break;
       }
