@@ -108,6 +108,7 @@ class ControlPanel extends JPanel {
     this.quitButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/icons/exit.png"))));
     this.quitButton.addActionListener((e) -> ViewUtils.quit(this));
     toolBar.add(quitButton);
+    this.stopButton.setEnabled(false);
   }
 
   private void loadFile() {
@@ -141,7 +142,7 @@ class ControlPanel extends JPanel {
     this.runButton.setEnabled(enabled);
     this.quitButton.setEnabled(enabled);
 
-    this.stopButton.setEnabled(true);
+    this.stopButton.setEnabled(!enabled);
   }
 
   private void startSimulation() {
